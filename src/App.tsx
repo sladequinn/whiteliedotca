@@ -8,10 +8,11 @@ import VideoFeed, { VideoFeedRef } from './components/VideoFeed';
 import HUD from './components/HUD';
 import StoreOverlay from './components/StoreOverlay';
 import LinksOverlay from './components/LinksOverlay';
+import InfoOverlay from './components/InfoOverlay';
 
 export default function App() {
     const [isMuted, setIsMuted] = useState(true);
-    const [activeOverlay, setActiveOverlay] = useState<'none' | 'store' | 'links'>('none');
+    const [activeOverlay, setActiveOverlay] = useState<'none' | 'store' | 'links' | 'info'>('none');
     const [activeCategory, setActiveCategory] = useState('featured');
     const [showUnmuteToast, setShowUnmuteToast] = useState(true);
     
@@ -37,7 +38,7 @@ export default function App() {
         }
     };
 
-    const handleToggleMenu = (menu: 'store' | 'links') => {
+    const handleToggleMenu = (menu: 'store' | 'links' | 'info') => {
         setActiveOverlay(activeOverlay === menu ? 'none' : menu);
     };
 
@@ -71,6 +72,11 @@ export default function App() {
 
             <LinksOverlay 
                 isOpen={activeOverlay === 'links'} 
+                onClose={() => setActiveOverlay('none')} 
+            />
+            
+            <InfoOverlay 
+                isOpen={activeOverlay === 'info'} 
                 onClose={() => setActiveOverlay('none')} 
             />
             

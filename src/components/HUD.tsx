@@ -3,7 +3,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 interface HUDProps {
     activeCategory: string;
     onCategorySelect: (category: string) => void;
-    onToggleMenu: (menu: 'store' | 'links') => void;
+    onToggleMenu: (menu: 'store' | 'links' | 'info') => void;
     isMuted: boolean;
     onToggleMute: () => void;
 }
@@ -52,12 +52,20 @@ export default function HUD({ activeCategory, onCategorySelect, onToggleMenu, is
                 >
                     STORE
                 </button>
-                <button 
-                    onClick={() => onToggleMenu('links')} 
-                    className="border-2 border-white/50 bg-black/40 backdrop-blur-md text-white px-6 py-2 text-[11px] font-black uppercase tracking-widest pointer-events-auto hover:bg-white hover:text-black transition-all"
-                >
-                    LINKS
-                </button>
+                <div className="flex gap-3 pointer-events-auto">
+                    <button 
+                        onClick={() => onToggleMenu('info')} 
+                        className="border-2 border-white/50 bg-black/40 backdrop-blur-md text-white px-4 py-2 text-[11px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all"
+                    >
+                        INFO
+                    </button>
+                    <button 
+                        onClick={() => onToggleMenu('links')} 
+                        className="border-2 border-white/50 bg-black/40 backdrop-blur-md text-white px-4 py-2 text-[11px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all"
+                    >
+                        LINKS
+                    </button>
+                </div>
             </div>
 
             {/* THE BRAND (BOTTOM LEFT) */}
