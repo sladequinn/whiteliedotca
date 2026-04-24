@@ -70,13 +70,13 @@ video {
 
 .coverflow-container {
     scroll-snap-type: x mandatory; scrollbar-width: none;
-    padding: 0 calc(50vw - 130px); 
+    padding: 0 calc(50vw - 100px); 
     gap: 40px;
     perspective: 1200px;
 }
-@media (min-width: 500px) {
+@media (min-width: 768px) {
     .coverflow-container {
-        padding: 0 calc(250px - 130px); /* 500px max-width / 2 */
+        padding: 0 calc(50vw - 130px);
     }
 }
 .coverflow-container::-webkit-scrollbar { display: none; }
@@ -273,11 +273,49 @@ video {
 
 .shirt-logo {
     position: absolute;
-    top: 35%; left: 50%;
+    top: 40%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 120px;
+    width: 35%; height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
     opacity: 0.95;
-    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6));
+}
+
+.apparel-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 0 5vw;
+    gap: 30px;
+    perspective: 1000px;
+    align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+    .apparel-track {
+        padding: 0 10vw;
+        gap: 60px;
+    }
+}
+
+.apparel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.apparel-item-wrapper {
+    scroll-snap-align: center;
+    flex-shrink: 0;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    .apparel-item-wrapper {
+        width: 320px;
+    }
 }
 
 .shirt-folds {
@@ -301,4 +339,22 @@ video {
 
 .album-wrapper.active-album .album-info-box {
     opacity: 1; transform: translateY(0);
+}
+
+@keyframes glitch-fast {
+    0% { transform: translate(0); }
+    10% { transform: translate(-2px, 2px); }
+    20% { transform: translate(2px, -2px); }
+    30% { transform: translate(-2px, -2px); }
+    40% { transform: translate(2px, 2px); }
+    50% { transform: translate(-2px, 2px); }
+    60% { transform: translate(2px, -2px); }
+    70% { transform: translate(-2px, -2px); }
+    80% { transform: translate(2px, 2px); }
+    90% { transform: translate(-2px, 2px); }
+    100% { transform: translate(0); }
+}
+
+.animate-glitch-fast {
+    animation: glitch-fast 0.15s infinite;
 }

@@ -33,15 +33,11 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
                     <div className="space-y-6 text-zinc-400 text-lg md:text-xl font-mono">
                         <div>
                             <p className="text-white font-bold text-sm tracking-widest uppercase mb-1 font-sans">Management & Booking</p>
-                            <a href="mailto:mgmt@whitelie.com" className="hover:text-white transition-colors">mgmt@whitelie.com</a>
+                            <a href="mailto:lilwhitelie1@gmail.com" className="hover:text-white transition-colors">lilwhitelie1@gmail.com</a>
                         </div>
                         <div>
-                            <p className="text-white font-bold text-sm tracking-widest uppercase mb-1 font-sans">Press Inquiries</p>
-                            <a href="mailto:press@whitelie.com" className="hover:text-white transition-colors">press@whitelie.com</a>
-                        </div>
-                        <div>
-                            <p className="text-white font-bold text-sm tracking-widest uppercase mb-1 font-sans">Store Support</p>
-                            <a href="mailto:store@whitelie.com" className="hover:text-white transition-colors">store@whitelie.com</a>
+                            <p className="text-white font-bold text-sm tracking-widest uppercase mb-1 font-sans">General Inquiry</p>
+                            <a href="mailto:lilwhitelie1@gmail.com" className="hover:text-white transition-colors">lilwhitelie1@gmail.com</a>
                         </div>
                     </div>
                 </section>

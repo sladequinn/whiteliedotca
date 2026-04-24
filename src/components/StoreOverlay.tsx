@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { albums } from '../data';
+import React, { useEffect, useRef, useState } from 'react';
+import { albums, merch } from '../data';
 
 interface StoreOverlayProps {
     isOpen: boolean;
@@ -14,8 +14,12 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
     const [quantities, setQuantities] = useState<Record<number, number>>({});
     const requestRef = useRef<number>();
     const [shirtRot, setShirtRot] = useState({ x: 10, y: -15 });
-    const [selectedSize, setSelectedSize] = useState('L');
-    const [showXlMenu, setShowXlMenu] = useState(false);
+    const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+    const showToast = (msg: string) => {
+        setToastMessage(msg);
+        setTimeout(() => setToastMessage(null), 3000);
+    };
 
     const handleShirtMove = (e: React.MouseEvent<HTMLDivElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -152,72 +156,100 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
                 </div>
                 
                 {/* APPAREL SECTION */}
-                <div className="px-8 pb-8 shrink-0 flex flex-col items-center">
-                    <p className="text-[10px] uppercase tracking-[0.3em] opacity-50 font-black mb-8 self-start">Apparel</p>
-                    
-                    <div 
-                        className="shirt-wrapper" 
-                        onMouseMove={handleShirtMove} 
-                        onMouseLeave={handleShirtLeave}
-                    >
-                        <div className="shirt-flat" style={{ transform: `rotateX(${shirtRot.x}deg) rotateY(${shirtRot.y}deg)` }}>
-                            <div className="shirt-texture"></div>
-                            <div className="shirt-collar-line"></div>
-                            <img src="https://res.cloudinary.com/dj3uocb74/image/upload/v1773257932/WLLOGOTRANSPARENTWEB_1_uxzw2g.png" alt="WH!TE L!E Logo" className="shirt-logo" />
-                            <div className="shirt-folds"></div>
+                <div className="px-8 pb-12 shrink-0">
+                    <div className="max-w-6xl mx-auto w-full mb-8 flex justify-between items-center">
+                        <p className="text-[10px] uppercase tracking-[0.3em] opacity-50 font-black">Apparel</p>
+                        <div className="flex gap-4">
+                            <button 
+                                onClick={() => {
+                                    const track = document.querySelector('.apparel-track');
+                                    if (track) {
+                                        const scrollAmount = window.innerWidth < 768 ? 240 : 320;
+                                        track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                                    }
+                                }}
+                                className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center bg-black/50 hover:bg-white hover:text-black transition-colors backdrop-blur-md"
+                                aria-label="Previous Apparel"
+                            >
+                                ←
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    const track = document.querySelector('.apparel-track');
+                                    if (track) {
+                                        const scrollAmount = window.innerWidth < 768 ? 240 : 320;
+                                        track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                                    }
+                                }}
+                                className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center bg-black/50 hover:bg-white hover:text-black transition-colors backdrop-blur-md"
+                                aria-label="Next Apparel"
+                            >
+                                →
+                            </button>
                         </div>
                     </div>
-
-                    <div className="mt-8 flex flex-col items-center bg-black/40 backdrop-blur-md p-4 border border-white/10 rounded-lg w-full max-w-xs">
-                        <p className="text-[16px] font-black italic tracking-tighter uppercase leading-tight drop-shadow-md text-center">WH!TE L!E Logo Tee</p>
-                        <p className="text-[10px] text-white/50 uppercase tracking-widest mt-1 mb-3">Premium Heavyweight Cotton</p>
-                        
-                        <div className="flex gap-2 mb-4 relative">
-                            {['XS', 'S', 'M', 'L'].map(size => (
-                                <button 
-                                    key={size}
-                                    onClick={() => { setSelectedSize(size); setShowXlMenu(false); }}
-                                    className={`border w-8 h-8 flex items-center justify-center text-xs transition-all ${selectedSize === size ? 'bg-white text-black border-white' : 'bg-white/10 border-white/20 text-white hover:bg-white/20'}`}
+                    
+                    <div className="apparel-track">
+                        {merch.map((item) => (
+                            <div key={item.id} className="apparel-item-wrapper">
+                                <div 
+                                    className="shirt-wrapper mb-8" 
+                                    onMouseMove={handleShirtMove} 
+                                    onMouseLeave={handleShirtLeave}
                                 >
-                                    {size}
-                                </button>
-                            ))}
-                            
-                            {/* XL+ Dropdown Button */}
-                            <div className="relative">
-                                <button 
-                                    onClick={() => setShowXlMenu(!showXlMenu)}
-                                    className={`border h-8 px-2 flex items-center justify-center text-xs transition-all gap-1 ${['XL', '2XL', '3XL', '4XL', '5XL'].includes(selectedSize) ? 'bg-white text-black border-white' : 'bg-white/10 border-white/20 text-white hover:bg-white/20'}`}
-                                >
-                                    {['XL', '2XL', '3XL', '4XL', '5XL'].includes(selectedSize) ? selectedSize : 'XL'}
-                                    <span className="text-[8px] opacity-70">▼</span>
-                                </button>
-                                
-                                {showXlMenu && (
-                                    <div className="absolute bottom-full left-0 mb-1 w-full min-w-[3rem] bg-black/90 backdrop-blur-md border border-white/20 flex flex-col z-50">
-                                        {['XL', '2XL', '3XL', '4XL', '5XL'].map(size => (
-                                            <button 
-                                                key={size}
-                                                onClick={() => { setSelectedSize(size); setShowXlMenu(false); }}
-                                                className={`text-xs py-2 transition-all text-center ${selectedSize === size ? 'bg-white text-black font-bold' : 'text-white hover:bg-white/20'}`}
-                                            >
-                                                {size}
-                                            </button>
-                                        ))}
+                                    <div className="shirt-flat" style={{ transform: `rotateX(${shirtRot.x}deg) rotateY(${shirtRot.y}deg)` }}>
+                                        <div className="shirt-texture"></div>
+                                        <div className="shirt-collar-line"></div>
+                                        <img src={item.front} alt={item.title} className="shirt-logo" />
+                                        <div className="shirt-folds"></div>
                                     </div>
-                                )}
+                                </div>
+
+                                <div className="flex flex-col items-center bg-black/40 backdrop-blur-md p-6 border border-white/10 rounded-lg w-full">
+                                    <p className="text-[14px] font-black italic tracking-tighter uppercase leading-tight drop-shadow-md text-center min-h-[2.5rem] flex items-center">{item.title}</p>
+                                    <p className="text-[9px] text-white/50 uppercase tracking-widest mt-1 mb-4 text-center">{item.blurb}</p>
+                                    
+                                    <button 
+                                        onClick={() => window.open(item.stripeUrl, '_blank')}
+                                        className="w-full bg-white text-black py-3 font-black italic text-[10px] tracking-widest hover:invert transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                                    >
+                                        BUY (${item.price})
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <button className="w-full bg-white text-black py-2 font-black italic text-xs tracking-widest hover:invert transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                            BUY ($45)
-                        </button>
+                        ))}
                     </div>
                 </div>
 
                 {/* ALBUM SECTION HEADER */}
-                <div className="px-8 pt-8 shrink-0">
-                    <p className="text-[10px] uppercase tracking-[0.3em] opacity-50 font-black self-start">Discography</p>
+                <div className="px-8 pt-8 shrink-0 flex justify-between items-center w-full max-w-4xl mx-auto">
+                    <p className="text-[10px] uppercase tracking-[0.3em] opacity-50 font-black">Discography</p>
+                    <div className="flex gap-4">
+                        <button 
+                            onClick={() => {
+                                if (trackRef.current) {
+                                    const scrollAmount = window.innerWidth < 768 ? 240 : 300;
+                                    trackRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                                }
+                            }}
+                            className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center bg-black/50 hover:bg-white hover:text-black transition-colors backdrop-blur-md"
+                            aria-label="Previous Album"
+                        >
+                            ←
+                        </button>
+                        <button 
+                            onClick={() => {
+                                if (trackRef.current) {
+                                    const scrollAmount = window.innerWidth < 768 ? 240 : 300;
+                                    trackRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                                }
+                            }}
+                            className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center bg-black/50 hover:bg-white hover:text-black transition-colors backdrop-blur-md"
+                            aria-label="Next Album"
+                        >
+                            →
+                        </button>
+                    </div>
                 </div>
 
                 {/* THE 3D SCROLL TRACK */}
@@ -263,7 +295,12 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
                                 </div>
                             </div>
                             
-                            <div className="album-info-box relative">
+                            <div 
+                                className="album-info-box relative"
+                                onClick={(e) => {
+                                    if (isFlipped) e.stopPropagation();
+                                }}
+                            >
                                 <div className="h-12 flex items-center justify-center mb-1">
                                     <h3 className="text-xl md:text-2xl font-black italic uppercase text-center leading-tight drop-shadow-md px-2">{album.title}</h3>
                                 </div>
@@ -282,18 +319,25 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
                                     
                                     <div className="flex items-center justify-between bg-white/10 backdrop-blur-md border border-white/20 rounded-sm p-1 mb-3 w-full max-w-[200px]">
                                         <div className="flex items-center">
-                                            <button onClick={(e) => updateQty(idx, -1, e)} className="px-3 py-1 text-white/50 hover:text-white transition-colors font-mono text-lg">-</button>
-                                            <span className="w-6 text-center text-sm font-mono font-bold">{qty}</span>
-                                            <button onClick={(e) => updateQty(idx, 1, e)} className="px-3 py-1 text-white/50 hover:text-white transition-colors font-mono text-lg">+</button>
+                                            <button onClick={(e) => updateQty(idx, -1, e)} className="px-4 py-2 text-white/50 hover:text-white transition-colors font-mono text-xl">-</button>
+                                            <span className="w-8 text-center text-sm font-mono font-bold">{qty}</span>
+                                            <button onClick={(e) => updateQty(idx, 1, e)} className="px-4 py-2 text-white/50 hover:text-white transition-colors font-mono text-xl">+</button>
                                         </div>
                                         <div className="text-sm font-mono font-bold pr-3">${album.price * qty}</div>
                                     </div>
 
                                     <button 
-                                        onClick={(e) => e.stopPropagation()}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (album.stripeUrl) {
+                                                window.open(album.stripeUrl, '_blank');
+                                            } else {
+                                                showToast(`ADDED TO CART: ${album.title}`);
+                                            }
+                                        }}
                                         className="w-full max-w-[200px] bg-white text-black py-3 text-[10px] uppercase tracking-[0.2em] font-black italic hover:invert transition-all text-center shadow-[0_0_20px_rgba(255,255,255,0.3)] mb-2"
                                     >
-                                        BUY PHYSICAL + DIGITAL
+                                        {album.isPreorder ? 'PRE-ORDER NOW' : 'BUY PHYSICAL + DIGITAL'}
                                     </button>
                                     
                                     <a 
@@ -327,7 +371,14 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
             <p className="shrink-0 mt-auto text-[9px] bg-black/80 backdrop-blur-md uppercase font-black tracking-[0.3em] text-center border-t border-white/10 py-5 relative z-20">
                 Hand-pressed & Shipped by WH!TE L!E
             </p>
-        </div>
+
+            {/* TOAST NOTIFICATION */}
+            <div 
+                className={`fixed bottom-20 left-1/2 -translate-x-1/2 z-[300] bg-white text-black px-6 py-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${toastMessage ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
+            >
+                {toastMessage}
+            </div>
+            </div>
         </div>
     );
 }

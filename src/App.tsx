@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import VideoFeed, { VideoFeedRef } from './components/VideoFeed';
 import HUD from './components/HUD';
 import StoreOverlay from './components/StoreOverlay';
@@ -15,8 +15,27 @@ export default function App() {
     const [activeOverlay, setActiveOverlay] = useState<'none' | 'store' | 'links' | 'info'>('none');
     const [activeCategory, setActiveCategory] = useState('featured');
     const [showUnmuteToast, setShowUnmuteToast] = useState(true);
+    const [isGlitching, setIsGlitching] = useState(false);
+    const [inputBuffer, setInputBuffer] = useState('');
     
     const feedRef = useRef<VideoFeedRef>(null);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const char = e.key.toLowerCase();
+            if (/^[a-z]$/.test(char)) {
+                const next = (inputBuffer + char).slice(-3);
+                setInputBuffer(next);
+                if (next === 'lie') {
+                    setIsGlitching(true);
+                    setTimeout(() => setIsGlitching(false), 5000);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [inputBuffer]);
 
     const handleVideoClick = () => {
         if (isMuted) {
@@ -84,6 +103,18 @@ export default function App() {
                 isOpen={activeOverlay === 'store'} 
                 onClose={() => setActiveOverlay('none')} 
             />
+
+            {/* EASTER EGG GLITCH OVERLAY */}
+            {isGlitching && (
+                <div className="fixed inset-0 z-[999] pointer-events-none bg-red-500/20 mix-blend-difference animate-pulse">
+                    <div className="absolute inset-0 bg-[url('https://res.cloudinary.com/dj3uocb74/image/upload/v1710000000/black_glitch_placeholder.jpg')] opacity-20 mix-blend-overlay animate-glitch-fast"></div>
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <h2 className="text-[15vw] font-black italic tracking-tighter leading-none text-white drop-shadow-[0_0_30px_red]">LIE</h2>
+                        <p className="text-xl font-mono tracking-[1em] text-red-500 animate-pulse">SYSTEM BREACH</p>
+                        <p className="mt-8 text-xs font-mono text-white/50">USE CODE 'TRUTH' FOR 20% OFF</p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
