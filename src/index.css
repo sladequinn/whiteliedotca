@@ -196,15 +196,6 @@ video {
     line-height: 14px;
 }
 
-/* Jewel Case Hinge */
-.cd-hinge {
-    position: absolute; left: 0; top: 0; bottom: 0; width: 28px;
-    background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(30,30,30,0.8) 10%, rgba(255,255,255,0.2) 15%, rgba(0,0,0,0.8) 20%, rgba(0,0,0,0.9) 100%);
-    border-right: 1px solid rgba(0,0,0,0.5);
-    z-index: 15;
-    pointer-events: none;
-}
-
 /* Plastic Shrink Wrap */
 .plastic-wrap {
     position: absolute; inset: 0; pointer-events: none; z-index: 20;
@@ -230,7 +221,7 @@ video {
     filter: blur(1px);
 }
 
-/* 3D Shirt */
+/* 3D Apparel (General) */
 .shirt-wrapper {
     perspective: 1000px;
     width: 240px; height: 280px;
@@ -238,30 +229,75 @@ video {
     cursor: pointer;
 }
 
-.shirt-flat {
+.apparel-box {
     position: relative;
     width: 100%; height: 100%;
     transform-style: preserve-3d;
     transition: transform 0.3s ease-out;
+}
+
+.apparel-body {
+    position: absolute; inset: 0;
+    transform-style: preserve-3d;
     background: #111;
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 280' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 80 15 C 80 15 120 50 160 15 L 200 25 L 240 65 L 220 105 L 190 85 L 190 270 L 50 270 L 50 85 L 20 105 L 0 65 L 40 25 Z'/%3E%3C/svg%3E");
     -webkit-mask-size: cover;
     -webkit-mask-position: center;
-    mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 280' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 80 15 C 80 15 120 50 160 15 L 200 25 L 240 65 L 220 105 L 190 85 L 190 270 L 50 270 L 50 85 L 20 105 L 0 65 L 40 25 Z'/%3E%3C/svg%3E");
     mask-size: cover;
     mask-position: center;
     box-shadow: inset 0 0 40px rgba(0,0,0,0.9);
 }
 
-/* Shirt Details */
-.shirt-texture {
-    position: absolute; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
-    pointer-events: none;
-    mix-blend-mode: overlay;
+/* SHIRT TYPE */
+.type-shirt .apparel-body {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 280' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 80 15 C 80 15 120 50 160 15 L 200 25 L 240 65 L 220 105 L 190 85 L 190 270 L 50 270 L 50 85 L 20 105 L 0 65 L 40 25 Z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 280' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 80 15 C 80 15 120 50 160 15 L 200 25 L 240 65 L 220 105 L 190 85 L 190 270 L 50 270 L 50 85 L 20 105 L 0 65 L 40 25 Z'/%3E%3C/svg%3E");
 }
 
-.shirt-collar-line {
+/* HOODIE TYPE */
+.type-hoodie .apparel-body {
+    /* Extended sleeves for long-sleeve look */
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 280' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 80 40 C 80 40 120 75 160 40 L 200 45 L 235 90 L 235 240 L 210 240 L 210 105 L 190 100 L 190 275 L 50 275 L 50 100 L 30 105 L 30 240 L 5 240 L 5 90 L 40 45 Z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 280' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 80 40 C 80 40 120 75 160 40 L 200 45 L 235 90 L 235 240 L 210 240 L 210 105 L 190 100 L 190 275 L 50 275 L 50 100 L 30 105 L 30 240 L 5 240 L 5 90 L 40 45 Z'/%3E%3C/svg%3E");
+}
+
+.hoodie-hood {
+    position: absolute;
+    top: -5px; left: 50%;
+    transform: translateX(-50%) translateZ(-5px);
+    width: 100px; height: 90px;
+    background: #080808;
+    border-radius: 50% 50% 15% 15%;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 
+        inset 0 -20px 40px rgba(0,0,0,1),
+        0 4px 10px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+
+.hoodie-hood::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 60px; height: 40px;
+    background: black;
+    border-radius: 50% 50% 0 0;
+    opacity: 0.8;
+}
+
+.hoodie-pocket {
+    position: absolute;
+    bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateZ(8px);
+    width: 110px; height: 55px;
+    background: #0d0d0d;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+}
+
+.apparel-collar {
     position: absolute;
     top: 15px; left: 50%;
     transform: translateX(-50%);
@@ -271,13 +307,88 @@ video {
     box-shadow: 0 4px 4px -2px rgba(0,0,0,0.5);
 }
 
-.shirt-logo {
+.type-hoodie .apparel-collar {
+    top: 40px;
+    width: 75px; height: 25px;
+    border-bottom-width: 3px;
+}
+
+.hoodie-strings {
     position: absolute;
-    top: 40%; left: 50%;
-    transform: translate(-50%, -50%);
+    top: 55px; left: 50%;
+    transform: translateX(-50%) translateZ(4px);
+    width: 30px; height: 40px;
+}
+
+.hoodie-strings::before, .hoodie-strings::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 2px; height: 100%;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+}
+
+.hoodie-strings::before { left: 5px; transform: rotate(3deg); }
+.hoodie-strings::after { right: 5px; transform: rotate(-3deg); }
+
+.apparel-logo {
+    position: absolute;
+    top: 42%; left: 50%;
+    transform: translate(-50%, -50%) translateZ(5px);
     width: 35%; height: auto;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
     opacity: 0.95;
+    pointer-events: none;
+}
+
+.type-hoodie .apparel-logo {
+    top: 48%;
+    width: 30%;
+}
+
+.apparel-texture {
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+    pointer-events: none;
+    mix-blend-mode: overlay;
+}
+
+.apparel-folds {
+    position: absolute; inset: 0;
+    background: 
+        linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.03) 25%, transparent 30%),
+        linear-gradient(-75deg, transparent 70%, rgba(0,0,0,0.4) 75%, transparent 80%),
+        radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.glass-glare {
+    display: none;
+}
+
+/* INFO & BUTTONS */
+.album-info-box {
+    width: 110%; margin-top: 30px;
+    opacity: 0.2; transform: translateY(10px); transition: all 0.4s ease;
+}
+
+.album-wrapper.active-album .album-info-box {
+    opacity: 1; transform: translateY(0);
+}
+
+@keyframes glitch-fast {
+    0% { transform: translate(0); }
+    10% { transform: translate(-2px, 2px); }
+    20% { transform: translate(2px, -2px); }
+    30% { transform: translate(-2px, -2px); }
+    40% { transform: translate(2px, 2px); }
+    50% { transform: translate(-2px, 2px); }
+    60% { transform: translate(2px, -2px); }
+    70% { transform: translate(-2px, -2px); }
+    80% { transform: translate(2px, 2px); }
+    90% { transform: translate(-2px, 2px); }
+    100% { transform: translate(0); }
 }
 
 .apparel-track {
@@ -318,41 +429,48 @@ video {
     }
 }
 
-.shirt-folds {
-    position: absolute; inset: 0;
-    background: 
-        linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.03) 25%, transparent 30%),
-        linear-gradient(-75deg, transparent 70%, rgba(0,0,0,0.4) 75%, transparent 80%),
-        radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
-    pointer-events: none;
+.album-wrapper.is-sold-out .album-box {
+    filter: grayscale(100%) brightness(0.4) contrast(0.8) !important;
 }
 
-.glass-glare {
-    display: none;
+.album-wrapper.is-sold-out .album-face {
+    opacity: 0.6;
 }
 
-/* INFO & BUTTONS */
-.album-info-box {
-    width: 110%; margin-top: 30px;
-    opacity: 0.2; transform: translateY(10px); transition: all 0.4s ease;
+.mysterious-back {
+    position: absolute;
+    inset: 0;
+    background: #080808;
+    background-image: 
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 70%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.2'/%3E%3C/svg%3E");
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-.album-wrapper.active-album .album-info-box {
-    opacity: 1; transform: translateY(0);
+.mysterious-back::before {
+    content: 'WH!TE L!E';
+    font-family: inherit;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 24px;
+    letter-spacing: -0.05em;
+    opacity: 0.1;
+    transform: rotate(-5deg);
 }
 
-@keyframes glitch-fast {
-    0% { transform: translate(0); }
-    10% { transform: translate(-2px, 2px); }
-    20% { transform: translate(2px, -2px); }
-    30% { transform: translate(-2px, -2px); }
-    40% { transform: translate(2px, 2px); }
-    50% { transform: translate(-2px, 2px); }
-    60% { transform: translate(2px, -2px); }
-    70% { transform: translate(-2px, -2px); }
-    80% { transform: translate(2px, 2px); }
-    90% { transform: translate(-2px, 2px); }
-    100% { transform: translate(0); }
+.mysterious-logo-blur {
+    width: 60%;
+    height: 60%;
+    background: white;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    opacity: 0.05;
+    filter: blur(8px);
 }
 
 .animate-glitch-fast {

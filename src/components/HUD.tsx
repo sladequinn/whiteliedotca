@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface HUDProps {
     activeCategory: string;
@@ -12,39 +13,97 @@ interface HUDProps {
 export default function HUD({ activeCategory, onCategorySelect, onToggleMenu, isMuted, onToggleMute }: HUDProps) {
     const [clickCount, setClickCount] = useState(0);
     const [isGlitching, setIsGlitching] = useState(false);
+    const [wordIndex, setWordIndex] = useState(0);
+
+    const glitchWords = ["UNDENIABLE", "ANTISOCIAL", "DETERMINED", "COMPLICATED", "HUSTLER", "LOST"];
 
     useEffect(() => {
-        if (clickCount >= 5) {
+        if (clickCount >= 5 && !isGlitching) {
             setIsGlitching(true);
-            const audio = new Audio('https://res.cloudinary.com/dj3uocb74/video/upload/v1772856943/duet19_r9wyag.mp4'); // Just a placeholder audio
+            const audio = new Audio('https://res.cloudinary.com/dj3uocb74/video/upload/v1772856943/duet19_r9wyag.mp4');
             audio.volume = 0.5;
             audio.play().catch(() => {});
             
             setTimeout(() => {
                 setIsGlitching(false);
                 setClickCount(0);
-            }, 4000);
+            }, 6000);
         }
         
         const timer = setTimeout(() => setClickCount(0), 2000);
         return () => clearTimeout(timer);
-    }, [clickCount]);
+    }, [clickCount, isGlitching]);
+
+    useEffect(() => {
+        let interval: number;
+        if (isGlitching) {
+            interval = window.setInterval(() => {
+                setWordIndex(i => (i + 1) % glitchWords.length);
+            }, 300); // Slightly faster cycle
+        }
+        return () => clearInterval(interval);
+    }, [isGlitching]);
 
     return (
         <>
             {/* EASTER EGG OVERLAY */}
-            {isGlitching && (
-                <div className="fixed inset-0 z-[999] bg-black flex flex-col items-center justify-center pointer-events-none animate-pulse">
-                    <div className="absolute inset-0 bg-[url('https://res.cloudinary.com/dj3uocb74/image/upload/v1710000000/black_glitch_placeholder.jpg')] bg-cover opacity-30 mix-blend-difference"></div>
-                    <h1 className="text-red-600 text-6xl md:text-9xl font-black italic tracking-tighter mix-blend-screen" style={{ textShadow: '4px 4px 0px #0ff, -4px -4px 0px #f0f' }}>
-                        UNDENIABLE
-                    </h1>
-                    <h1 className="text-white text-6xl md:text-9xl font-black italic tracking-tighter mix-blend-screen mt-[-20px]" style={{ textShadow: '4px 4px 0px #0ff, -4px -4px 0px #f0f' }}>
-                        UNDERDOG
-                    </h1>
-                    <p className="text-white font-mono mt-8 tracking-[0.5em] text-sm md:text-xl">THE TRUTH IS COMING</p>
-                </div>
-            )}
+            <AnimatePresence>
+                {isGlitching && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[999] bg-black flex flex-col items-center justify-center pointer-events-none"
+                    >
+                        {/* NOISE OVERLAY */}
+                        <div className="absolute inset-0 bg-[url('https://res.cloudinary.com/dj3uocb74/image/upload/v1710000000/black_glitch_placeholder.jpg')] bg-cover opacity-20 mix-blend-overlay"></div>
+                        
+                        {/* GLITCH PULSE */}
+                        <motion.div 
+                            animate={{ 
+                                scale: [1, 1.1, 0.9, 1.05, 1],
+                                x: [0, -10, 10, -5, 0],
+                                y: [0, 5, -5, 2, 0]
+                            }}
+                            transition={{ repeat: Infinity, duration: 0.2 }}
+                            className="relative"
+                        >
+                            <h1 
+                                className="text-white text-7xl md:text-[12rem] font-black italic tracking-tighter leading-none"
+                                style={{ 
+                                    textShadow: '8px 8px 0px #ff0000, -8px -8px 0px #00ffff',
+                                    filter: 'contrast(150%) brightness(120%)'
+                                }}
+                            >
+                                {glitchWords[wordIndex]}
+                            </h1>
+                            
+                            {/* GHOST LAYERS */}
+                            <motion.h1 
+                                animate={{ x: [-20, 20, -20], opacity: [0.5, 0.2, 0.5] }}
+                                transition={{ repeat: Infinity, duration: 0.1 }}
+                                className="absolute inset-0 text-cyan-400 text-7xl md:text-[12rem] font-black italic tracking-tighter leading-none mix-blend-screen opacity-50 blur-sm"
+                            >
+                                {glitchWords[wordIndex]}
+                            </motion.h1>
+                            <motion.h1 
+                                animate={{ x: [20, -20, 20], opacity: [0.5, 0.2, 0.5] }}
+                                transition={{ repeat: Infinity, duration: 0.15 }}
+                                className="absolute inset-0 text-red-600 text-7xl md:text-[12rem] font-black italic tracking-tighter leading-none mix-blend-screen opacity-50 blur-sm"
+                            >
+                                {glitchWords[wordIndex]}
+                            </motion.h1>
+                        </motion.div>
+
+                        {/* VIGNETTE FLASH */}
+                        <motion.div 
+                            animate={{ opacity: [0, 0.4, 0] }}
+                            transition={{ repeat: Infinity, duration: 0.05 }}
+                            className="absolute inset-0 bg-red-600/10 pointer-events-none"
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
             {/* THE TUNER (TOP LEFT) */}
             <nav className="absolute top-10 left-6 z-[100] flex flex-col gap-4 items-start hud-shadow pointer-events-auto">
                 <button 

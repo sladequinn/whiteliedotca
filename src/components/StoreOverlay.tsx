@@ -11,10 +11,19 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
     const [activeBg, setActiveBg] = useState(albums[0].front);
     const [flippedIndex, setFlippedIndex] = useState<number | null>(null);
     const [activeIndex, setActiveIndex] = useState(0);
-    const [quantities, setQuantities] = useState<Record<number, number>>({});
     const requestRef = useRef<number>();
     const [shirtRot, setShirtRot] = useState({ x: 10, y: -15 });
     const [toastMessage, setToastMessage] = useState<string | null>(null);
+    const [activeVariants, setActiveVariants] = useState<Record<string, number>>({});
+
+    const groupedMerch = merch.reduce((acc, item) => {
+        const baseTitle = item.title.replace(/ (SHIRT|HOODIE|Signature Tee|Tee)$/i, '').trim();
+        if (!acc[baseTitle]) acc[baseTitle] = [];
+        acc[baseTitle].push(item);
+        return acc;
+    }, {} as Record<string, typeof merch>);
+
+    const baseTitles = Object.keys(groupedMerch);
 
     const showToast = (msg: string) => {
         setToastMessage(msg);
@@ -132,15 +141,6 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
         }
     };
 
-    const updateQty = (idx: number, delta: number, e: React.MouseEvent) => {
-        e.stopPropagation();
-        setQuantities(prev => {
-            const current = prev[idx] || 1;
-            const next = Math.max(1, current + delta);
-            return { ...prev, [idx]: next };
-        });
-    };
-
     return (
         <div 
             id="store" 
@@ -190,34 +190,65 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
                     </div>
                     
                     <div className="apparel-track">
-                        {merch.map((item) => (
-                            <div key={item.id} className="apparel-item-wrapper">
-                                <div 
-                                    className="shirt-wrapper mb-8" 
-                                    onMouseMove={handleShirtMove} 
-                                    onMouseLeave={handleShirtLeave}
-                                >
-                                    <div className="shirt-flat" style={{ transform: `rotateX(${shirtRot.x}deg) rotateY(${shirtRot.y}deg)` }}>
-                                        <div className="shirt-texture"></div>
-                                        <div className="shirt-collar-line"></div>
-                                        <img src={item.front} alt={item.title} className="shirt-logo" />
-                                        <div className="shirt-folds"></div>
+                        {baseTitles.map((baseTitle) => {
+                            const variants = groupedMerch[baseTitle];
+                            const activeIdx = activeVariants[baseTitle] || 0;
+                            const item = variants[activeIdx];
+                            
+                            return (
+                                <div key={baseTitle} className="apparel-item-wrapper">
+                                    <div 
+                                        className={`shirt-wrapper mb-8 type-${item.type}`} 
+                                        onMouseMove={handleShirtMove} 
+                                        onMouseLeave={handleShirtLeave}
+                                    >
+                                        <div className="apparel-box" style={{ transform: `rotateX(${shirtRot.x}deg) rotateY(${shirtRot.y}deg)` }}>
+                                            {/* HOODIE EXTRAS */}
+                                            {item.type === 'hoodie' && <div className="hoodie-hood"></div>}
+                                            
+                                            <div className="apparel-body">
+                                                <div className="apparel-texture"></div>
+                                                <div className="apparel-collar"></div>
+                                                {item.type === 'hoodie' && <div className="hoodie-strings"></div>}
+                                                <img src={item.front} alt={item.title} className="apparel-logo" />
+                                                <div className="apparel-folds"></div>
+                                            </div>
+    
+                                            {/* KANGAROO POCKET */}
+                                            {item.type === 'hoodie' && <div className="hoodie-pocket"></div>}
+                                        </div>
+                                    </div>
+    
+                                    <div className="flex flex-col items-center bg-black/40 backdrop-blur-md p-6 border border-white/10 rounded-lg w-full">
+                                        <p className="text-[14px] font-black italic tracking-tighter uppercase leading-tight drop-shadow-md text-center min-h-[2.5rem] flex items-center">{baseTitle}</p>
+                                        
+                                        {/* VARIANT SELECTOR */}
+                                        {variants.length > 1 && (
+                                            <div className="flex gap-2 mb-4 w-full">
+                                                {variants.map((v, vIdx) => (
+                                                    <button
+                                                        key={v.id}
+                                                        onClick={() => setActiveVariants(prev => ({ ...prev, [baseTitle]: vIdx }))}
+                                                        className={`flex-1 py-1 text-[8px] uppercase tracking-widest border transition-all ${activeIdx === vIdx ? 'bg-white text-black border-white' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'}`}
+                                                    >
+                                                        {v.type}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        <p className="text-[9px] text-white/50 uppercase tracking-widest mt-1 mb-4 text-center">{item.blurb}</p>
+                                        
+                                        <button 
+                                            onClick={() => window.open(item.stripeUrl, '_blank')}
+                                            className="w-full bg-white text-black py-3 font-black italic text-[10px] tracking-widest hover:invert transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                                        >
+                                            BUY {item.type.toUpperCase()} (${item.price})
+                                        </button>
                                     </div>
                                 </div>
-
-                                <div className="flex flex-col items-center bg-black/40 backdrop-blur-md p-6 border border-white/10 rounded-lg w-full">
-                                    <p className="text-[14px] font-black italic tracking-tighter uppercase leading-tight drop-shadow-md text-center min-h-[2.5rem] flex items-center">{item.title}</p>
-                                    <p className="text-[9px] text-white/50 uppercase tracking-widest mt-1 mb-4 text-center">{item.blurb}</p>
-                                    
-                                    <button 
-                                        onClick={() => window.open(item.stripeUrl, '_blank')}
-                                        className="w-full bg-white text-black py-3 font-black italic text-[10px] tracking-widest hover:invert transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)]"
-                                    >
-                                        BUY (${item.price})
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -262,12 +293,11 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
                 >
                 {albums.map((album, idx) => {
                     const isFlipped = flippedIndex === idx;
-                    const qty = quantities[idx] || 1;
                     
                     return (
                         <div 
                             key={idx} 
-                            className={`album-wrapper ${isFlipped ? 'is-flipped' : ''} ${activeIndex === idx ? 'active-album' : ''}`} 
+                            className={`album-wrapper ${isFlipped ? 'is-flipped' : ''} ${activeIndex === idx ? 'active-album' : ''} ${album.isSoldOut ? 'is-sold-out' : ''}`} 
                             data-bg={album.front}
                             onClick={(e) => handleAlbumClick(idx, e)}
                         >
@@ -276,7 +306,6 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
                                     {/* FRONT */}
                                     <div className="album-face face-front">
                                         <img src={album.front} alt={`${album.title} Front`} className="w-full h-full object-cover" />
-                                        <div className="cd-hinge"></div>
                                         <div className="plastic-wrap"></div>
                                     </div>
                                     {/* SPINES */}
@@ -289,7 +318,19 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
                                     <div className="album-face face-bottom"></div>
                                     {/* BACK */}
                                     <div className="album-face face-back">
-                                        <img src={album.back} alt={`${album.title} Back`} className="w-full h-full object-cover" />
+                                        {album.title === "Undeniable Underdog" ? (
+                                            <div className="mysterious-back">
+                                                <div 
+                                                    className="mysterious-logo-blur"
+                                                    style={{ 
+                                                        maskImage: `url('${album.front}')`,
+                                                        WebkitMaskImage: `url('${album.front}')`
+                                                    }}
+                                                ></div>
+                                            </div>
+                                        ) : (
+                                            <img src={album.back} alt={`${album.title} Back`} className="w-full h-full object-cover" />
+                                        )}
                                         <div className="plastic-wrap"></div>
                                     </div>
                                 </div>
@@ -317,46 +358,41 @@ export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
                                         "{album.blurb}"
                                     </p>
                                     
-                                    <div className="flex items-center justify-between bg-white/10 backdrop-blur-md border border-white/20 rounded-sm p-1 mb-3 w-full max-w-[200px]">
-                                        <div className="flex items-center">
-                                            <button onClick={(e) => updateQty(idx, -1, e)} className="px-4 py-2 text-white/50 hover:text-white transition-colors font-mono text-xl">-</button>
-                                            <span className="w-8 text-center text-sm font-mono font-bold">{qty}</span>
-                                            <button onClick={(e) => updateQty(idx, 1, e)} className="px-4 py-2 text-white/50 hover:text-white transition-colors font-mono text-xl">+</button>
-                                        </div>
-                                        <div className="text-sm font-mono font-bold pr-3">${album.price * qty}</div>
-                                    </div>
-
                                     <button 
+                                        disabled={album.isSoldOut}
                                         onClick={(e) => {
                                             e.stopPropagation();
+                                            if (album.isSoldOut) return;
                                             if (album.stripeUrl) {
                                                 window.open(album.stripeUrl, '_blank');
                                             } else {
                                                 showToast(`ADDED TO CART: ${album.title}`);
                                             }
                                         }}
-                                        className="w-full max-w-[200px] bg-white text-black py-3 text-[10px] uppercase tracking-[0.2em] font-black italic hover:invert transition-all text-center shadow-[0_0_20px_rgba(255,255,255,0.3)] mb-2"
+                                        className={`w-full max-w-[200px] py-3 text-[10px] uppercase tracking-[0.2em] font-black italic transition-all text-center mb-2 shadow-[0_0_20px_rgba(255,255,255,0.3)] ${album.isSoldOut ? 'bg-white/10 text-white/30 cursor-not-allowed shadow-none' : 'bg-white text-black hover:invert'}`}
                                     >
-                                        {album.isPreorder ? 'PRE-ORDER NOW' : 'BUY PHYSICAL + DIGITAL'}
+                                        {album.isSoldOut ? 'SOLD OUT' : album.isPreorder ? 'PRE-ORDER NOW' : 'BUY PHYSICAL'}
                                     </button>
                                     
-                                    <a 
-                                        href={album.spotify} 
-                                        target="_blank" 
-                                        rel="noreferrer" 
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="block w-full max-w-[200px] border border-white/30 text-white/90 py-2 text-[9px] uppercase tracking-[0.2em] font-black italic hover:bg-white hover:text-black transition-all text-center"
-                                    >
-                                        LISTEN ON SPOTIFY
-                                    </a>
+                                    {album.spotify && (
+                                        <a 
+                                            href={album.spotify} 
+                                            target="_blank" 
+                                            rel="noreferrer" 
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="block w-full max-w-[200px] border border-white/30 text-white/90 py-2 text-[9px] uppercase tracking-[0.2em] font-black italic hover:bg-white hover:text-black transition-all text-center"
+                                        >
+                                            LISTEN ON SPOTIFY
+                                        </a>
+                                    )}
                                 </div>
                                 
                                 {/* Unflipped state hint */}
                                 <div 
                                     className="absolute left-0 right-0 top-12 text-center transition-all duration-500" 
                                     style={{ 
-                                        opacity: isFlipped ? 0 : 0.5, 
-                                        transform: isFlipped ? 'translateY(10px)' : 'translateY(0)',
+                                        opacity: isFlipped || album.isSoldOut ? 0 : 0.5, 
+                                        transform: isFlipped || album.isSoldOut ? 'translateY(10px)' : 'translateY(0)',
                                         pointerEvents: 'none' 
                                     }}
                                 >
