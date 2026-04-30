@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { motion } from 'motion/react';
 import { playlist } from '../data';
 
 interface VideoFeedProps {
     isMuted: boolean;
     onCategoryChange: (category: string) => void;
     onVideoClick: () => void;
+    isGlitching?: boolean;
 }
 
 export interface VideoFeedRef {
     scrollToCategory: (category: string) => void;
 }
 
-const VideoFeed = forwardRef<VideoFeedRef, VideoFeedProps>(({ isMuted, onCategoryChange, onVideoClick }, ref) => {
+const VideoFeed = forwardRef<VideoFeedRef, VideoFeedProps>(({ isMuted, onCategoryChange, onVideoClick, isGlitching = false }, ref) => {
     const feedRef = useRef<HTMLDivElement>(null);
     const [activeIndex, setActiveIndex] = useState(0);
     const observerRef = useRef<IntersectionObserver | null>(null);
@@ -100,17 +102,31 @@ const VideoFeed = forwardRef<VideoFeedRef, VideoFeedProps>(({ isMuted, onCategor
                         data-index={index}
                     >
                         {isNearby ? (
-                            <video 
-                                src={item.url} 
-                                loop 
-                                playsInline 
-                                muted={isMuted} 
-                                preload="metadata"
-                            />
+                            <div className={`w-full h-full transition-all duration-75 ${isGlitching ? 'extreme-glitch' : ''}`}>
+                                <video 
+                                    src={item.url} 
+                                    loop 
+                                    playsInline 
+                                    muted={isMuted} 
+                                    preload="metadata"
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
                         ) : (
                             <div className="w-full h-full bg-zinc-900 animate-pulse" />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none"></div>
+                        {isGlitching && (
+                            <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+                                <div className="absolute inset-0 bg-white/5 mix-blend-overlay animate-pulse opacity-20"></div>
+                                <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-20 bg-[length:100%_2px,3px_100%]"></div>
+                                <motion.div 
+                                    animate={{ y: [-100, 400] }}
+                                    transition={{ repeat: Infinity, duration: 0.5, ease: "linear" }}
+                                    className="w-full h-1 bg-white/10 blur-sm mix-blend-overlay"
+                                />
+                            </div>
+                        )}
                     </section>
                 );
             })}

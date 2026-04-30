@@ -429,14 +429,6 @@ video {
     }
 }
 
-.album-wrapper.is-sold-out .album-box {
-    filter: grayscale(100%) brightness(0.4) contrast(0.8) !important;
-}
-
-.album-wrapper.is-sold-out .album-face {
-    opacity: 0.6;
-}
-
 .mysterious-back {
     position: absolute;
     inset: 0;
@@ -471,6 +463,20 @@ video {
     mask-position: center;
     opacity: 0.05;
     filter: blur(8px);
+}
+
+.extreme-glitch {
+    filter: hue-rotate(90deg) invert(0.1) contrast(1.5) brightness(1.2) !important;
+    animation: glitch-extreme 0.1s infinite !important;
+}
+
+@keyframes glitch-extreme {
+    0% { transform: translate(0) skew(0deg); filter: hue-rotate(0deg); }
+    20% { transform: translate(-10px, 5px) skew(10deg); filter: hue-rotate(90deg) contrast(200%); }
+    40% { transform: translate(10px, -5px) skew(-10deg); filter: invert(0.2) saturate(300%); }
+    60% { transform: translate(-5px, -10px) skew(5deg); filter: grayscale(1) brightness(200%); }
+    80% { transform: translate(5px, 10px) skew(-5deg); filter: hue-rotate(270deg); }
+    100% { transform: translate(0) skew(0deg); }
 }
 
 .animate-glitch-fast {

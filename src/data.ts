@@ -137,7 +137,7 @@ export const merch = [
         back: "https://res.cloudinary.com/dj3uocb74/image/upload/v1776988900/IMG_1929_bnagju.jpg",
         blurb: "Mental Meltdown Official Tee.",
         price: 30,
-        stripeUrl: "https://buy.stripe.com/14AbJ1g4G5y4bmi4wC8N20e"
+        stripeUrl: "https://buy.stripe.com/14A00jaKmgcI61Ye7c8N20g"
     },
     {
         id: "mental-meltdown-hoodie",
@@ -147,7 +147,7 @@ export const merch = [
         back: "https://res.cloudinary.com/dj3uocb74/image/upload/v1776988900/IMG_1929_bnagju.jpg",
         blurb: "Mental Meltdown Premium Hoodie.",
         price: 60,
-        stripeUrl: "https://buy.stripe.com/14AbJ1g4G5y4bmi4wC8N20e"
+        stripeUrl: "https://buy.stripe.com/14A00jaKmgcI61Ye7c8N20g"
     },
     {
         id: "chug-a-lug-2-hoodie",
