@@ -56,6 +56,12 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          {token && (
+            <span className="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 border border-white/20 bg-zinc-900 text-zinc-300">
+              {token.startsWith('static_') ? 'STATIC MODE' : 'SERVER MODE'}
+            </span>
+          )}
+
           <button
             onClick={onClose}
             className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-white text-black hover:bg-red-600 hover:text-white text-[10px] sm:text-xs font-black uppercase tracking-wider transition-colors"

@@ -39,8 +39,9 @@ To access the admin panel:
 * **Albums & Releases Manager:** Manage vinyl/cassette releases, front & back artwork URLs, descriptions, prices, Pre-Order & Sold Out badges, Spotify links, and Stripe checkout buttons.
 * **Apparel & Merch Manager:** Manage shirts, hoodies, prices, front & back 3D garment artwork, and Stripe payment links.
 * **Links & Bio Manager:** Update all external streaming/social links (Spotify, Apple Music, TikTok, Instagram, YouTube) and artist contact/bio copy.
-* **GitHub Sync & Static Export:** One-click button in the Security tab to sync all current videos, albums, and merch directly into `src/data.ts`. This ensures static GitHub / Vercel / Netlify builds always reflect your latest changes.
-* **Security & Factory Reset:** Update admin password securely (scrypt hash + salt) and reset back to original seed data with one click if needed.
+* **GitHub Sync & Static Export:** Full static host support (Vercel & GitHub Pages)! Use the one-click server sync when running Node, or click **"DOWNLOAD DATA.TS"** or **"COPY CODE"** directly in your browser on static deployments to update `src/data.ts`.
+* **Hybrid Storage & Offline Resilience:** Edits are automatically saved to browser storage (`localStorage`) as well as the database, allowing full editing capabilities even when deployed on static servers like Vercel or GitHub Pages without a backend running.
+* **Security & Factory Reset:** Update admin password securely (scrypt hash on server, WebCrypto PBKDF2 in browser) and reset back to original seed data with one click if needed.
 * **Mobile-Optimized:** Fully responsive on phones and tablets with sticky top header, horizontal touch-scrolling tabs, enlarged touch targets, safe-area padding, and font scaling to prevent auto-zoom on iOS.
 
 ## 🚀 How to Run Locally
