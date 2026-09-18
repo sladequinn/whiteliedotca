@@ -34,11 +34,14 @@ To access the admin panel:
 * **Password:** `whitelie519` *(can be changed directly in the Security tab of the Admin Panel)*
 
 ### Features:
-* **Video Reel Manager:** Add new video URLs (Cloudinary, MP4, WebM), preview videos in a popup player, edit video URLs/titles/categories, reorder playback sequence with up/down arrows, and delete videos across Featured, Duets, and Munchtime channels.
+* **Video Reel Manager:** Add new video URLs (Cloudinary, MP4, WebM), preview videos in a popup player, edit video URLs/titles/categories, reorder playback sequence with up/down touch-friendly arrows, and delete videos across Featured, Duets, and Munchtime channels.
+* **Hosting Guide for Videos:** Helpful in-app guide explaining why videos are hosted externally via URLs (Cloudinary / S3 / R2) instead of committed to Git (which has file size limits and lacks video streaming chunking).
 * **Albums & Releases Manager:** Manage vinyl/cassette releases, front & back artwork URLs, descriptions, prices, Pre-Order & Sold Out badges, Spotify links, and Stripe checkout buttons.
 * **Apparel & Merch Manager:** Manage shirts, hoodies, prices, front & back 3D garment artwork, and Stripe payment links.
 * **Links & Bio Manager:** Update all external streaming/social links (Spotify, Apple Music, TikTok, Instagram, YouTube) and artist contact/bio copy.
+* **GitHub Sync & Static Export:** One-click button in the Security tab to sync all current videos, albums, and merch directly into `src/data.ts`. This ensures static GitHub / Vercel / Netlify builds always reflect your latest changes.
 * **Security & Factory Reset:** Update admin password securely (scrypt hash + salt) and reset back to original seed data with one click if needed.
+* **Mobile-Optimized:** Fully responsive on phones and tablets with sticky top header, horizontal touch-scrolling tabs, enlarged touch targets, safe-area padding, and font scaling to prevent auto-zoom on iOS.
 
 ## 🚀 How to Run Locally
 

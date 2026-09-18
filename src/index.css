@@ -482,3 +482,11 @@ video {
 .animate-glitch-fast {
     animation: glitch-fast 0.15s infinite;
 }
+
+/* MOBILE ENHANCEMENTS */
+@supports (padding-top: env(safe-area-inset-top)) {
+    header {
+        padding-top: max(0.75rem, env(safe-area-inset-top));
+    }
+}
+

@@ -166,7 +166,7 @@ export default function HUD({
             </div>
 
             {/* THE BRAND (BOTTOM LEFT) */}
-            <div className="absolute bottom-10 left-6 z-[100] hud-shadow pointer-events-auto flex items-baseline gap-3">
+            <div className="absolute bottom-10 left-6 z-[100] hud-shadow pointer-events-auto flex items-baseline gap-2.5">
                 <h1 
                     onClick={() => setClickCount(c => c + 1)}
                     className="text-4xl sm:text-5xl italic font-black tracking-tighter leading-none cursor-pointer select-none hover:text-red-500 transition-colors duration-300"
@@ -176,7 +176,7 @@ export default function HUD({
                 {onOpenAdmin && (
                     <button
                         onClick={onOpenAdmin}
-                        className="text-[9px] font-mono tracking-widest text-zinc-500 hover:text-red-400 hover:underline transition-colors uppercase"
+                        className="text-[10px] sm:text-[9px] font-mono tracking-widest text-zinc-400 sm:text-zinc-500 hover:text-red-400 hover:underline transition-colors uppercase px-1.5 py-1 bg-black/40 backdrop-blur-sm sm:bg-transparent border border-white/10 sm:border-transparent rounded-sm"
                         title="Backstage Admin Panel"
                     >
                         [BACKSTAGE]

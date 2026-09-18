@@ -91,6 +91,7 @@ interface AppDataContextType {
   updateLinks: (links: LinkItem[]) => Promise<void>;
   updateInfo: (info: InfoItem) => Promise<void>;
   resetToDefaults: () => Promise<void>;
+  exportToDataFile: () => Promise<void>;
 }
 
 const defaultLinks: LinkItem[] = [
@@ -373,6 +374,17 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     await refreshData();
   };
 
+  const exportToDataFile = async () => {
+    const res = await fetch('/api/export-to-data-file', {
+      method: 'POST',
+      headers: authHeaders(),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to export data');
+    }
+  };
+
   return (
     <AppDataContext.Provider
       value={{
@@ -402,6 +414,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         updateLinks,
         updateInfo,
         resetToDefaults,
+        exportToDataFile,
       }}
     >
       {children}

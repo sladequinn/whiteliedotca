@@ -88,14 +88,14 @@ export default function MerchManager() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 pb-3 md:pb-4 border-b border-white/10">
         <div>
-          <h2 className="text-2xl font-black italic tracking-tight text-white flex items-center gap-2">
-            <ShoppingBag className="text-red-500" size={24} /> APPAREL & MERCHANDISE
+          <h2 className="text-xl sm:text-2xl font-black italic tracking-tight text-white flex items-center gap-2">
+            <ShoppingBag className="text-red-500" size={22} /> APPAREL & MERCHANDISE
           </h2>
-          <p className="text-xs text-zinc-400 font-mono mt-1">
+          <p className="text-[11px] sm:text-xs text-zinc-400 font-mono mt-1">
             Manage shirts, hoodies, accessories, 3D clothing textures, and checkout links.
           </p>
         </div>
@@ -108,7 +108,7 @@ export default function MerchManager() {
               setIsAdding(true);
             }
           }}
-          className="bg-white text-black hover:bg-red-500 hover:text-white px-5 py-2 text-xs font-black uppercase tracking-widest transition-colors flex items-center gap-2 self-start md:self-auto"
+          className="w-full sm:w-auto bg-white text-black hover:bg-red-500 hover:text-white px-5 py-2.5 sm:py-2 text-xs font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 self-start sm:self-auto"
         >
           <Plus size={14} /> {isAdding ? 'CANCEL' : 'ADD MERCH ITEM'}
         </button>
@@ -128,14 +128,14 @@ export default function MerchManager() {
 
       {/* FORM DRAWER */}
       {isAdding && (
-        <div className="border border-white/20 bg-zinc-950 p-6 space-y-4">
-          <h3 className="text-sm font-black uppercase tracking-widest text-white font-mono flex items-center gap-2">
+        <div className="border border-white/20 bg-zinc-950 p-4 sm:p-6 space-y-4">
+          <h3 className="text-xs sm:text-sm font-black uppercase tracking-widest text-white font-mono flex items-center gap-2">
             {editingMerch ? 'EDIT MERCH ITEM' : 'ADD NEW MERCH ITEM'}
           </h3>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+              <div className="sm:col-span-2">
                 <label className="block text-[10px] font-mono uppercase text-zinc-400 mb-1">Item Title *</label>
                 <input
                   type="text"
@@ -197,7 +197,7 @@ export default function MerchManager() {
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div className="sm:col-span-2">
                 <label className="block text-[10px] font-mono uppercase text-zinc-400 mb-1">Description / Blurb</label>
                 <input
                   type="text"
@@ -220,17 +220,17 @@ export default function MerchManager() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-3 border-t border-white/10">
               <button
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white"
+                className="w-full sm:w-auto px-4 py-2.5 sm:py-2 text-xs font-mono text-zinc-400 hover:text-white"
               >
                 CANCEL
               </button>
               <button
                 type="submit"
-                className="bg-white text-black hover:bg-red-500 hover:text-white px-6 py-2.5 text-xs font-black uppercase tracking-widest transition-colors"
+                className="w-full sm:w-auto bg-white text-black hover:bg-red-500 hover:text-white px-6 py-2.5 text-xs font-black uppercase tracking-widest transition-colors"
               >
                 {editingMerch ? 'UPDATE MERCH' : 'SAVE MERCH'}
               </button>
@@ -240,7 +240,7 @@ export default function MerchManager() {
       )}
 
       {/* MERCH GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {merch.map((item) => (
           <div
             key={item.id}

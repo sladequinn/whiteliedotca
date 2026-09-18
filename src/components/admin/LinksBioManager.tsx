@@ -74,14 +74,14 @@ export default function LinksBioManager() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 pb-3 md:pb-4 border-b border-white/10">
         <div>
-          <h2 className="text-2xl font-black italic tracking-tight text-white flex items-center gap-2">
-            <Globe className="text-red-500" size={24} /> LINKS & BIO / CONTACT
+          <h2 className="text-xl sm:text-2xl font-black italic tracking-tight text-white flex items-center gap-2">
+            <Globe className="text-red-500" size={22} /> LINKS & BIO / CONTACT
           </h2>
-          <p className="text-xs text-zinc-400 font-mono mt-1">
+          <p className="text-[11px] sm:text-xs text-zinc-400 font-mono mt-1">
             Update streaming platform links, social media destinations, and the official artist bio.
           </p>
         </div>
@@ -89,7 +89,7 @@ export default function LinksBioManager() {
         <button
           onClick={handleSaveAll}
           disabled={isSaving}
-          className="bg-white text-black hover:bg-red-500 hover:text-white px-6 py-2.5 text-xs font-black uppercase tracking-widest transition-colors flex items-center gap-2 self-start md:self-auto disabled:opacity-50"
+          className="w-full sm:w-auto bg-white text-black hover:bg-red-500 hover:text-white px-6 py-2.5 text-xs font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 self-start sm:self-auto disabled:opacity-50"
         >
           <Save size={14} /> {isSaving ? 'SAVING...' : 'SAVE ALL CHANGES'}
         </button>
@@ -102,21 +102,21 @@ export default function LinksBioManager() {
       )}
 
       {/* TWO COLUMN LAYOUT */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
         {/* SOCIAL & MUSIC LINKS */}
-        <div className="border border-white/15 bg-zinc-950/80 p-5 space-y-4">
+        <div className="border border-white/15 bg-zinc-950/80 p-4 sm:p-5 space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div>
-              <h3 className="text-sm font-black uppercase tracking-widest text-white font-mono">
+              <h3 className="text-xs sm:text-sm font-black uppercase tracking-widest text-white font-mono">
                 OVERLAY LINKS
               </h3>
-              <p className="text-[11px] font-mono text-zinc-400">
+              <p className="text-[10px] sm:text-[11px] font-mono text-zinc-400">
                 Displayed in the full-screen LINKS modal
               </p>
             </div>
             <button
               onClick={handleAddLink}
-              className="px-3 py-1 bg-zinc-900 hover:bg-white hover:text-black text-zinc-300 border border-white/20 text-[10px] font-mono uppercase font-bold flex items-center gap-1"
+              className="px-3 py-1.5 bg-zinc-900 hover:bg-white hover:text-black text-zinc-300 border border-white/20 text-[10px] font-mono uppercase font-bold flex items-center gap-1"
             >
               <Plus size={12} /> ADD
             </button>
@@ -124,19 +124,19 @@ export default function LinksBioManager() {
 
           <div className="space-y-3">
             {editableLinks.map((link, idx) => (
-              <div key={link.id || idx} className="p-3 bg-black/60 border border-white/10 flex items-center gap-2">
+              <div key={link.id || idx} className="p-2.5 sm:p-3 bg-black/60 border border-white/10 flex items-center gap-2">
                 <div className="flex flex-col gap-1 text-zinc-500">
                   <button
                     disabled={idx === 0}
                     onClick={() => handleMoveLink(idx, 'up')}
-                    className="hover:text-white disabled:opacity-20"
+                    className="p-0.5 hover:text-white disabled:opacity-20"
                   >
                     <ArrowUp size={12} />
                   </button>
                   <button
                     disabled={idx === editableLinks.length - 1}
                     onClick={() => handleMoveLink(idx, 'down')}
-                    className="hover:text-white disabled:opacity-20"
+                    className="p-0.5 hover:text-white disabled:opacity-20"
                   >
                     <ArrowDown size={12} />
                   </button>
@@ -161,7 +161,7 @@ export default function LinksBioManager() {
 
                 <button
                   onClick={() => handleRemoveLink(idx)}
-                  className="p-2 text-zinc-500 hover:text-red-400"
+                  className="p-1.5 text-zinc-500 hover:text-red-400"
                   title="Remove"
                 >
                   <Trash2 size={14} />
@@ -172,7 +172,7 @@ export default function LinksBioManager() {
         </div>
 
         {/* BIO & CONTACT */}
-        <div className="border border-white/15 bg-zinc-950/80 p-5 space-y-4">
+        <div className="border border-white/15 bg-zinc-950/80 p-4 sm:p-5 space-y-4">
           <div className="pb-3 border-b border-white/10">
             <h3 className="text-sm font-black uppercase tracking-widest text-white font-mono">
               ABOUT & CONTACT INFO

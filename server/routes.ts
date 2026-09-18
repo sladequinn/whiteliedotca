@@ -1,5 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import { db, hashPassword, verifyPassword, initDatabase } from './db.js';
 
 export const router = Router();
@@ -440,6 +442,69 @@ router.put('/info', requireAuth, (req, res) => {
   `).run(about_text || '', management_email || '', general_email || '');
 
   return res.json({ success: true });
+});
+
+// POST /api/export-to-data-file (syncs current SQLite state into src/data.ts for static hosts / git commits)
+router.post('/export-to-data-file', requireAuth, (_req, res) => {
+  try {
+    const videos = db.prepare('SELECT * FROM videos ORDER BY category ASC, sort_order ASC').all() as Array<{
+      id: string;
+      url: string;
+      category: string;
+      sort_order: number;
+    }>;
+    const albums = db.prepare('SELECT * FROM albums ORDER BY sort_order ASC').all() as Array<any>;
+    const merch = db.prepare('SELECT * FROM merch ORDER BY sort_order ASC').all() as Array<any>;
+
+    const channels = {
+      featured: videos.filter(v => v.category === 'featured').map(v => v.url),
+      duets: videos.filter(v => v.category === 'duets').map(v => v.url),
+      munchtime: videos.filter(v => v.category === 'munchtime').map(v => v.url),
+    };
+
+    const formattedAlbums = albums.map(a => ({
+      title: a.title,
+      front: a.front,
+      back: a.back,
+      blurb: a.blurb,
+      price: a.price,
+      ...(a.is_preorder ? { isPreorder: true } : {}),
+      ...(a.is_sold_out ? { isSoldOut: true } : {}),
+      ...(a.stripe_url ? { stripeUrl: a.stripe_url } : {}),
+      ...(a.spotify ? { spotify: a.spotify } : {}),
+    }));
+
+    const formattedMerch = merch.map(m => ({
+      id: m.id,
+      title: m.title,
+      type: m.type,
+      front: m.front,
+      back: m.back,
+      blurb: m.blurb,
+      price: m.price,
+      ...(m.stripe_url ? { stripeUrl: m.stripe_url } : {}),
+    }));
+
+    const fileContent = `export const rawChannels = ${JSON.stringify(channels, null, 4)};\n\n` +
+      `export const albums = ${JSON.stringify(formattedAlbums, null, 4)};\n\n` +
+      `export const merch = ${JSON.stringify(formattedMerch, null, 4)};\n\n` +
+      `export const storeItems = [\n` +
+      `    ...merch.map(m => ({ ...m, type: 'merch' as const })),\n` +
+      `    ...albums.map(a => ({ ...a, type: 'album' as const })),\n` +
+      `];\n\n` +
+      `const shuffle = <T>(array: T[]): T[] => [...array].sort(() => Math.random() - 0.5);\n\n` +
+      `export const playlist = [\n` +
+      `    ...rawChannels.featured.map((url, i) => ({ id: \`feat-\${i}\`, url, category: 'featured' })),\n` +
+      `    ...shuffle(rawChannels.duets).map((url, i) => ({ id: \`duet-\${i}\`, url, category: 'duets' })),\n` +
+      `    ...shuffle(rawChannels.munchtime).map((url, i) => ({ id: \`munch-\${i}\`, url, category: 'munchtime' }))\n` +
+      `];\n`;
+
+    const dataPath = path.resolve(process.cwd(), 'src/data.ts');
+    fs.writeFileSync(dataPath, fileContent, 'utf-8');
+    return res.json({ success: true, message: 'Updated src/data.ts successfully' });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || 'Failed to export to data.ts' });
+  }
 });
 
 // POST /api/reset (reset database back to defaults from data.ts)

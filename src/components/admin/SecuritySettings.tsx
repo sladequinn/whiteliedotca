@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAppData } from '../../context/AppDataContext';
-import { KeyRound, RotateCcw, Check, AlertCircle, ShieldAlert } from 'lucide-react';
+import { KeyRound, RotateCcw, Check, AlertCircle, ShieldAlert, GitBranch, Download, FileCode } from 'lucide-react';
 
 export default function SecuritySettings() {
-  const { token, resetToDefaults } = useAppData();
+  const { token, resetToDefaults, exportToDataFile } = useAppData();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -12,6 +12,9 @@ export default function SecuritySettings() {
 
   const [isResetting, setIsResetting] = useState(false);
   const [resetToast, setResetToast] = useState<string | null>(null);
+
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportToast, setExportToast] = useState<string | null>(null);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +56,19 @@ export default function SecuritySettings() {
     }
   };
 
+  const handleExportData = async () => {
+    setIsExporting(true);
+    try {
+      await exportToDataFile();
+      setExportToast('Synced! Current database has been written to src/data.ts.');
+      setTimeout(() => setExportToast(null), 5000);
+    } catch (err: any) {
+      alert('Error exporting to file: ' + err.message);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const handleResetData = async () => {
     if (!confirm('WARNING: This will reset all videos, albums, merch, and links back to the original hardcoded defaults from data.ts. Are you sure?')) {
       return;
@@ -71,21 +87,52 @@ export default function SecuritySettings() {
   };
 
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="space-y-6 md:space-y-8 max-w-2xl">
       {/* HEADER */}
-      <div className="pb-4 border-b border-white/10">
-        <h2 className="text-2xl font-black italic tracking-tight text-white flex items-center gap-2">
-          <KeyRound className="text-red-500" size={24} /> SECURITY & SYSTEM
+      <div className="pb-3 md:pb-4 border-b border-white/10">
+        <h2 className="text-xl md:text-2xl font-black italic tracking-tight text-white flex items-center gap-2">
+          <KeyRound className="text-red-500" size={22} /> SECURITY & SYSTEM
         </h2>
-        <p className="text-xs text-zinc-400 font-mono mt-1">
-          Manage admin login credentials and database controls.
+        <p className="text-[11px] md:text-xs text-zinc-400 font-mono mt-1">
+          Manage admin login credentials, GitHub code sync, and database controls.
         </p>
       </div>
 
+      {/* GITHUB SYNC / STATIC HOSTING EXPORT */}
+      <div className="border border-white/15 bg-zinc-950/80 p-4 md:p-6 space-y-3 md:space-y-4">
+        <div className="flex items-center gap-2 text-cyan-400 font-mono text-[10px] md:text-xs uppercase tracking-widest font-black">
+          <GitBranch size={16} /> GITHUB / STATIC HOSTING SYNC
+        </div>
+
+        <h3 className="text-xs md:text-sm font-black uppercase tracking-widest text-white font-mono">
+          SYNC CHANGES TO SRC/DATA.TS (FOR GITHUB DEPLOYS)
+        </h3>
+
+        <p className="text-[11px] md:text-xs text-zinc-400 font-mono leading-relaxed">
+          Hosting on GitHub Pages, Netlify, or Vercel? Click this button to save all your latest videos, 
+          albums, and merch changes directly into <code className="text-white font-mono bg-zinc-900 px-1 py-0.5">src/data.ts</code>. 
+          That way, your edits are preserved in git and built into static production bundles.
+        </p>
+
+        {exportToast && (
+          <div className="p-3 bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 text-xs font-mono flex items-center gap-2">
+            <Check size={16} /> {exportToast}
+          </div>
+        )}
+
+        <button
+          onClick={handleExportData}
+          disabled={isExporting}
+          className="w-full sm:w-auto bg-white text-black hover:bg-cyan-400 hover:text-black px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          <FileCode size={14} /> {isExporting ? 'SYNCING...' : 'SYNC ALL CHANGES TO SRC/DATA.TS'}
+        </button>
+      </div>
+
       {/* CHANGE PASSWORD */}
-      <div className="border border-white/15 bg-zinc-950/80 p-6 space-y-4">
+      <div className="border border-white/15 bg-zinc-950/80 p-4 md:p-6 space-y-4">
         <div className="pb-2 border-b border-white/10">
-          <h3 className="text-sm font-black uppercase tracking-widest text-white font-mono">
+          <h3 className="text-xs md:text-sm font-black uppercase tracking-widest text-white font-mono">
             CHANGE ADMIN PASSWORD
           </h3>
           <p className="text-[11px] font-mono text-zinc-400">
@@ -154,7 +201,7 @@ export default function SecuritySettings() {
           <button
             type="submit"
             disabled={isChangingPass}
-            className="mt-2 bg-white text-black hover:bg-red-500 hover:text-white px-6 py-2.5 text-xs font-black uppercase tracking-widest transition-colors disabled:opacity-50"
+            className="w-full sm:w-auto mt-2 bg-white text-black hover:bg-red-500 hover:text-white px-6 py-2.5 text-xs font-black uppercase tracking-widest transition-colors disabled:opacity-50"
           >
             {isChangingPass ? 'UPDATING...' : 'UPDATE PASSWORD'}
           </button>
@@ -162,16 +209,16 @@ export default function SecuritySettings() {
       </div>
 
       {/* DANGER ZONE: RESET TO FACTORY DEFAULTS */}
-      <div className="border border-red-900/40 bg-red-950/20 p-6 space-y-4">
-        <div className="flex items-center gap-2 text-red-500 font-mono text-xs uppercase tracking-widest font-black">
+      <div className="border border-red-900/40 bg-red-950/20 p-4 md:p-6 space-y-3 md:space-y-4">
+        <div className="flex items-center gap-2 text-red-500 font-mono text-[10px] md:text-xs uppercase tracking-widest font-black">
           <ShieldAlert size={16} /> DANGER ZONE
         </div>
 
-        <h3 className="text-sm font-black uppercase tracking-widest text-white font-mono">
+        <h3 className="text-xs md:text-sm font-black uppercase tracking-widest text-white font-mono">
           RESET DATABASE TO ORIGINAL FACTORY DEFAULTS
         </h3>
 
-        <p className="text-xs text-zinc-400 font-mono leading-relaxed">
+        <p className="text-[11px] md:text-xs text-zinc-400 font-mono leading-relaxed">
           Restore all videos, albums, merch products, and links back to the original WH!TE L!E defaults. 
           Use this if you want to undo any experimental changes or start clean.
         </p>
@@ -185,7 +232,7 @@ export default function SecuritySettings() {
         <button
           onClick={handleResetData}
           disabled={isResetting}
-          className="bg-transparent border border-red-500 text-red-400 hover:bg-red-600 hover:text-white px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-colors flex items-center gap-2 disabled:opacity-50"
+          className="w-full sm:w-auto bg-transparent border border-red-500 text-red-400 hover:bg-red-600 hover:text-white px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
         >
           <RotateCcw size={14} /> {isResetting ? 'RESETTING...' : 'RESET ALL DATA TO DEFAULTS'}
         </button>
