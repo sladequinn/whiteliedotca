@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useAppData } from '../../context/AppDataContext';
-import { KeyRound, RotateCcw, Check, AlertCircle, ShieldAlert, GitBranch, Download, FileCode } from 'lucide-react';
+import { KeyRound, RotateCcw, Check, AlertCircle, ShieldAlert, GitBranch, Download, FileCode, Copy } from 'lucide-react';
+import { changePasswordLocal } from '../../utils/localAuth';
 
 export default function SecuritySettings() {
-  const { token, resetToDefaults, exportToDataFile } = useAppData();
+  const { token, resetToDefaults, exportToDataFile, downloadDataFileLocal, getDataFileCode } = useAppData();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,6 +16,7 @@ export default function SecuritySettings() {
 
   const [isExporting, setIsExporting] = useState(false);
   const [exportToast, setExportToast] = useState<string | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,17 +34,37 @@ export default function SecuritySettings() {
 
     setIsChangingPass(true);
     try {
-      const res = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ currentPassword, newPassword }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to change password');
+      let changed = false;
+
+      // Try server endpoint first
+      try {
+        const res = await fetch('/api/auth/change-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ currentPassword, newPassword }),
+        });
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const data = await res.json();
+          if (res.ok) {
+            changed = true;
+          } else {
+            throw new Error(data.error || 'Failed to change password');
+          }
+        }
+      } catch (serverErr: any) {
+        if (serverErr.message && !serverErr.message.includes('Failed to fetch')) {
+          throw serverErr;
+        }
+      }
+
+      // Fallback: update client storage (for static hosts)
+      if (!changed) {
+        await changePasswordLocal(currentPassword, newPassword);
+        changed = true;
       }
 
       setPassToast({ type: 'success', msg: 'Password updated successfully!' });
@@ -60,12 +82,26 @@ export default function SecuritySettings() {
     setIsExporting(true);
     try {
       await exportToDataFile();
-      setExportToast('Synced! Current database has been written to src/data.ts.');
+      setExportToast('Synced! Current database has been written to src/data.ts on the server.');
       setTimeout(() => setExportToast(null), 5000);
     } catch (err: any) {
-      alert('Error exporting to file: ' + err.message);
+      // On static hosting, fallback to downloading file directly
+      downloadDataFileLocal();
+      setExportToast('Downloaded data.ts file! (Server API is in static mode on Vercel/GitHub)');
+      setTimeout(() => setExportToast(null), 5000);
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  const handleCopyCode = async () => {
+    try {
+      const code = getDataFileCode();
+      await navigator.clipboard.writeText(code);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 3000);
+    } catch {
+      alert('Unable to copy to clipboard automatically.');
     }
   };
 
@@ -120,13 +156,32 @@ export default function SecuritySettings() {
           </div>
         )}
 
-        <button
-          onClick={handleExportData}
-          disabled={isExporting}
-          className="w-full sm:w-auto bg-white text-black hover:bg-cyan-400 hover:text-black px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-        >
-          <FileCode size={14} /> {isExporting ? 'SYNCING...' : 'SYNC ALL CHANGES TO SRC/DATA.TS'}
-        </button>
+        <div className="flex flex-wrap gap-2.5">
+          <button
+            onClick={handleExportData}
+            disabled={isExporting}
+            className="w-full sm:w-auto bg-white text-black hover:bg-cyan-400 hover:text-black px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            <FileCode size={14} /> {isExporting ? 'SYNCING...' : 'SYNC ALL CHANGES TO SRC/DATA.TS'}
+          </button>
+
+          <button
+            onClick={downloadDataFileLocal}
+            className="w-full sm:w-auto bg-zinc-900 border border-white/20 text-white hover:bg-white hover:text-black px-4 py-2.5 text-xs font-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+            title="Download data.ts file to your device"
+          >
+            <Download size={14} /> DOWNLOAD DATA.TS
+          </button>
+
+          <button
+            onClick={handleCopyCode}
+            className="w-full sm:w-auto bg-zinc-900 border border-white/20 text-white hover:bg-white hover:text-black px-4 py-2.5 text-xs font-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+            title="Copy code to clipboard"
+          >
+            {copiedCode ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+            {copiedCode ? 'COPIED CODE!' : 'COPY CODE'}
+          </button>
+        </div>
       </div>
 
       {/* CHANGE PASSWORD */}
