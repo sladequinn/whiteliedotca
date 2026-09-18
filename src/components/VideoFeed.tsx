@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { motion } from 'motion/react';
-import { playlist } from '../data';
+import { useAppData } from '../context/AppDataContext';
 
 interface VideoFeedProps {
     isMuted: boolean;
@@ -14,6 +14,7 @@ export interface VideoFeedRef {
 }
 
 const VideoFeed = forwardRef<VideoFeedRef, VideoFeedProps>(({ isMuted, onCategoryChange, onVideoClick, isGlitching = false }, ref) => {
+    const { playlist } = useAppData();
     const feedRef = useRef<HTMLDivElement>(null);
     const [activeIndex, setActiveIndex] = useState(0);
     const observerRef = useRef<IntersectionObserver | null>(null);

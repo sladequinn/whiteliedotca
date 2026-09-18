@@ -9,15 +9,36 @@ import HUD from './components/HUD';
 import StoreOverlay from './components/StoreOverlay';
 import LinksOverlay from './components/LinksOverlay';
 import InfoOverlay from './components/InfoOverlay';
+import AdminPanel from './components/admin/AdminPanel';
 
 export default function App() {
     const [isMuted, setIsMuted] = useState(true);
-    const [activeOverlay, setActiveOverlay] = useState<'none' | 'store' | 'links' | 'info'>('none');
+    const [activeOverlay, setActiveOverlay] = useState<'none' | 'store' | 'links' | 'info' | 'admin'>('none');
     const [activeCategory, setActiveCategory] = useState('featured');
     const [showUnmuteToast, setShowUnmuteToast] = useState(true);
     const [isGlitching, setIsGlitching] = useState(false);
     
     const feedRef = useRef<VideoFeedRef>(null);
+
+    // Check for admin route in URL (#admin or ?admin or /admin)
+    useEffect(() => {
+        const checkAdminHashOrQuery = () => {
+            const hash = window.location.hash.toLowerCase();
+            const search = window.location.search.toLowerCase();
+            const pathname = window.location.pathname.toLowerCase();
+            if (hash === '#admin' || hash === '#backstage' || search.includes('admin') || pathname.endsWith('/admin')) {
+                setActiveOverlay('admin');
+            }
+        };
+
+        checkAdminHashOrQuery();
+        window.addEventListener('hashchange', checkAdminHashOrQuery);
+        window.addEventListener('popstate', checkAdminHashOrQuery);
+        return () => {
+            window.removeEventListener('hashchange', checkAdminHashOrQuery);
+            window.removeEventListener('popstate', checkAdminHashOrQuery);
+        };
+    }, []);
 
     const toggleGlitch = (active: boolean) => {
         setIsGlitching(active);
@@ -25,14 +46,14 @@ export default function App() {
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key.toLowerCase() === 'm') {
+            if (e.key.toLowerCase() === 'm' && activeOverlay !== 'admin') {
                 handleToggleMute();
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isMuted]);
+    }, [isMuted, activeOverlay]);
 
     const handleVideoClick = () => {
         if (isMuted) {
@@ -58,6 +79,18 @@ export default function App() {
         setActiveOverlay(activeOverlay === menu ? 'none' : menu);
     };
 
+    const handleOpenAdmin = () => {
+        setActiveOverlay('admin');
+        window.location.hash = 'admin';
+    };
+
+    const handleCloseAdmin = () => {
+        setActiveOverlay('none');
+        if (window.location.hash === '#admin' || window.location.hash === '#backstage') {
+            history.pushState(null, '', window.location.pathname + window.location.search);
+        }
+    };
+
     return (
         <div className="font-brutal antialiased text-white selection:bg-white selection:text-black">
             <div className="noise"></div>
@@ -67,6 +100,7 @@ export default function App() {
                     activeCategory={activeCategory}
                     onCategorySelect={handleCategorySelect}
                     onToggleMenu={handleToggleMenu}
+                    onOpenAdmin={handleOpenAdmin}
                     isMuted={isMuted}
                     onToggleMute={handleToggleMute}
                     onGlitchToggle={toggleGlitch}
@@ -102,6 +136,11 @@ export default function App() {
             <StoreOverlay 
                 isOpen={activeOverlay === 'store'} 
                 onClose={() => setActiveOverlay('none')} 
+            />
+
+            <AdminPanel
+                isOpen={activeOverlay === 'admin'}
+                onClose={handleCloseAdmin}
             />
         </div>
     );

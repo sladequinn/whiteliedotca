@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAppData } from '../context/AppDataContext';
 
 interface InfoOverlayProps {
     isOpen: boolean;
@@ -6,6 +7,10 @@ interface InfoOverlayProps {
 }
 
 export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
+    const { info } = useAppData();
+
+    const paragraphs = (info?.about_text || '').split('\n').filter(p => p.trim());
+
     return (
         <div 
             id="info" 
@@ -18,13 +23,11 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
                 <section>
                     <h2 className="text-4xl md:text-6xl italic font-black tracking-tighter mb-6">ABOUT</h2>
                     <div className="space-y-4 text-zinc-400 text-lg md:text-xl leading-relaxed font-mono">
-                        <p>
-                            WH!TE L!E is a boundary-pushing artist blending raw energy with meticulously crafted soundscapes. 
-                            Known for high-octane performances and a unique visual aesthetic, the music speaks to the chaotic beauty of modern life.
-                        </p>
-                        <p>
-                            Hailing from the underground and rising to mainstream consciousness, WH!TE L!E continues to redefine what it means to be an independent creator in the digital age.
-                        </p>
+                        {paragraphs.length > 0 ? (
+                            paragraphs.map((p, i) => <p key={i}>{p}</p>)
+                        ) : (
+                            <p>WH!TE L!E Official</p>
+                        )}
                     </div>
                 </section>
 
@@ -33,11 +36,15 @@ export default function InfoOverlay({ isOpen, onClose }: InfoOverlayProps) {
                     <div className="space-y-6 text-zinc-400 text-lg md:text-xl font-mono">
                         <div>
                             <p className="text-white font-bold text-sm tracking-widest uppercase mb-1 font-sans">Management & Booking</p>
-                            <a href="mailto:lilwhitelie1@gmail.com" className="hover:text-white transition-colors">lilwhitelie1@gmail.com</a>
+                            <a href={`mailto:${info?.management_email || 'lilwhitelie1@gmail.com'}`} className="hover:text-white transition-colors">
+                                {info?.management_email || 'lilwhitelie1@gmail.com'}
+                            </a>
                         </div>
                         <div>
                             <p className="text-white font-bold text-sm tracking-widest uppercase mb-1 font-sans">General Inquiry</p>
-                            <a href="mailto:lilwhitelie1@gmail.com" className="hover:text-white transition-colors">lilwhitelie1@gmail.com</a>
+                            <a href={`mailto:${info?.general_email || 'lilwhitelie1@gmail.com'}`} className="hover:text-white transition-colors">
+                                {info?.general_email || 'lilwhitelie1@gmail.com'}
+                            </a>
                         </div>
                     </div>
                 </section>

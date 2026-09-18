@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface HUDProps {
     activeCategory: string;
     onCategorySelect: (category: string) => void;
     onToggleMenu: (menu: 'store' | 'links' | 'info') => void;
+    onOpenAdmin?: () => void;
     isMuted: boolean;
     onToggleMute: () => void;
     onGlitchToggle: (active: boolean) => void;
@@ -16,6 +17,7 @@ export default function HUD({
     activeCategory, 
     onCategorySelect, 
     onToggleMenu, 
+    onOpenAdmin,
     isMuted, 
     onToggleMute,
     onGlitchToggle,
@@ -164,13 +166,22 @@ export default function HUD({
             </div>
 
             {/* THE BRAND (BOTTOM LEFT) */}
-            <div className="absolute bottom-10 left-6 z-[100] hud-shadow pointer-events-auto">
+            <div className="absolute bottom-10 left-6 z-[100] hud-shadow pointer-events-auto flex items-baseline gap-2.5">
                 <h1 
                     onClick={() => setClickCount(c => c + 1)}
                     className="text-4xl sm:text-5xl italic font-black tracking-tighter leading-none cursor-pointer select-none hover:text-red-500 transition-colors duration-300"
                 >
                     WH!TE L!E
                 </h1>
+                {onOpenAdmin && (
+                    <button
+                        onClick={onOpenAdmin}
+                        className="text-[10px] sm:text-[9px] font-mono tracking-widest text-zinc-400 sm:text-zinc-500 hover:text-red-400 hover:underline transition-colors uppercase px-1.5 py-1 bg-black/40 backdrop-blur-sm sm:bg-transparent border border-white/10 sm:border-transparent rounded-sm"
+                        title="Backstage Admin Panel"
+                    >
+                        [BACKSTAGE]
+                    </button>
+                )}
             </div>
         </>
     );
