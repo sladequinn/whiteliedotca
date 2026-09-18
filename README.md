@@ -8,16 +8,37 @@ Here is a quick breakdown of what the most important files do:
 
 * **`src/App.tsx`** 
   The main application file. This controls the retro TV interface, the static noise transitions, and the channel surfing logic.
+* **`src/components/admin/`**
+  The Backstage Admin Panel. Allows White Lie to log in, add, edit, reorder, and delete video URLs, album releases, merchandise items, links, and artist bio.
+* **`server/`**
+  Express API server and SQLite database (`whitelie.db`). Handles authenticated REST endpoints (`/api/auth/*`, `/api/videos/*`, `/api/albums/*`, `/api/merch/*`, `/api/links`, `/api/info`).
 * **`src/components/StoreOverlay.tsx`** 
   The 3D album store. This contains the logic for the scrolling coverflow, the 3D tilt effect, and the shopping cart quantities.
 * **`src/data.ts`** 
-  The database. This is where all the video links (featured, duets, munchtime) and the album details (titles, images, prices, Spotify links) are stored. If you want to add a new video or album, you do it here.
+  Default initial content for videos, albums, and merch. Seeded into SQLite on initial launch.
 * **`src/index.css`** 
   The styling file. This contains the Tailwind CSS setup, the TV scanline effects, and all the complex 3D math and plastic wrap glare effects for the albums.
 * **`package.json`** 
   The instruction manual for Node.js. It tells the system what libraries to install (like React and Tailwind) and how to run the app.
 * **`vite.config.ts`** 
-  The configuration file for Vite, which is the tool used to build and run this React project quickly.
+  The configuration file for Vite, with integrated Express API middleware for seamless local and production dev.
+
+## 🔐 Backstage Admin Panel
+
+To access the admin panel:
+1. Click **`[BACKSTAGE]`** next to the **`WH!TE L!E`** logo in the bottom-left corner of the HUD, OR
+2. Navigate to `http://localhost:3000/#admin` or `http://localhost:3000/?admin`
+
+**Default Credentials:**
+* **Username:** `whitelie`
+* **Password:** `whitelie519` *(can be changed directly in the Security tab of the Admin Panel)*
+
+### Features:
+* **Video Reel Manager:** Add new video URLs (Cloudinary, MP4, WebM), preview videos in a popup player, edit video URLs/titles/categories, reorder playback sequence with up/down arrows, and delete videos across Featured, Duets, and Munchtime channels.
+* **Albums & Releases Manager:** Manage vinyl/cassette releases, front & back artwork URLs, descriptions, prices, Pre-Order & Sold Out badges, Spotify links, and Stripe checkout buttons.
+* **Apparel & Merch Manager:** Manage shirts, hoodies, prices, front & back 3D garment artwork, and Stripe payment links.
+* **Links & Bio Manager:** Update all external streaming/social links (Spotify, Apple Music, TikTok, Instagram, YouTube) and artist contact/bio copy.
+* **Security & Factory Reset:** Update admin password securely (scrypt hash + salt) and reset back to original seed data with one click if needed.
 
 ## 🚀 How to Run Locally
 

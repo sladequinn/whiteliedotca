@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { albums, merch } from '../data';
+import { useAppData } from '../context/AppDataContext';
 
 interface StoreOverlayProps {
     isOpen: boolean;
@@ -7,14 +7,21 @@ interface StoreOverlayProps {
 }
 
 export default function StoreOverlay({ isOpen, onClose }: StoreOverlayProps) {
+    const { albums, merch } = useAppData();
     const trackRef = useRef<HTMLDivElement>(null);
-    const [activeBg, setActiveBg] = useState(albums[0].front);
+    const [activeBg, setActiveBg] = useState(() => albums[0]?.front || '');
     const [flippedIndex, setFlippedIndex] = useState<number | null>(null);
     const [activeIndex, setActiveIndex] = useState(0);
     const requestRef = useRef<number>();
     const [shirtRot, setShirtRot] = useState({ x: 10, y: -15 });
     const [toastMessage, setToastMessage] = useState<string | null>(null);
     const [activeVariants, setActiveVariants] = useState<Record<string, number>>({});
+
+    useEffect(() => {
+        if (albums[0]?.front && !activeBg) {
+            setActiveBg(albums[0].front);
+        }
+    }, [albums, activeBg]);
 
     const groupedMerch = merch.reduce((acc, item) => {
         const baseTitle = item.title.replace(/ (SHIRT|HOODIE|Signature Tee|Tee)$/i, '').trim();
