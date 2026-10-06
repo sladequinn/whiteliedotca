@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAppData } from '../../context/AppDataContext';
 import { Lock, ArrowRight, ShieldCheck, Sparkles, AlertCircle } from 'lucide-react';
+import { authenticateLocal } from '../../utils/localAuth';
 
 interface AdminLoginProps {
   onSuccess?: () => void;
@@ -19,19 +20,43 @@ export default function AdminLogin({ onSuccess }: AdminLoginProps) {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
+      let loggedIn = false;
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Login failed');
+      // First attempt: Call backend API if running (Node/Express standalone or Vite dev)
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const data = await res.json();
+          if (res.ok && data.token) {
+            login(data.token, data.username);
+            loggedIn = true;
+          } else if (res.status === 401 || res.status === 400) {
+            throw new Error(data.error || 'Invalid username or password');
+          }
+        }
+      } catch (apiErr: any) {
+        if (apiErr.message === 'Invalid username or password') {
+          throw apiErr;
+        }
+        // Otherwise API endpoint is 404 on static host (Vercel/GitHub Pages), fall through to client auth
       }
 
-      login(data.token, data.username);
-      if (onSuccess) onSuccess();
+      // Fallback: If backend API is not available (e.g. static host like Vercel/GitHub Pages)
+      if (!loggedIn) {
+        const localSession = await authenticateLocal(username, password);
+        login(localSession.token, localSession.username);
+        loggedIn = true;
+      }
+
+      if (loggedIn && onSuccess) {
+        onSuccess();
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to authenticate');
     } finally {

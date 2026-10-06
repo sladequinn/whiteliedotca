@@ -161,6 +161,20 @@ export const merch = [
     }
 ];
 
+export const siteLinks = [
+    { id: 'spotify', title: 'SPOTIFY', url: 'https://open.spotify.com/artist/6IgPg8MO2tPuQFHcM6MF4o', sort_order: 0 },
+    { id: 'applemusic', title: 'APPLE MUSIC', url: 'https://music.apple.com/ca/artist/lil-white-lie/1496696984', sort_order: 1 },
+    { id: 'tiktok', title: 'TIKTOK', url: 'https://www.tiktok.com/@whitelie519', sort_order: 2 },
+    { id: 'instagram', title: 'INSTAGRAM', url: 'https://www.instagram.com/lilwhitelie519', sort_order: 3 },
+    { id: 'youtube', title: 'YOUTUBE', url: 'https://www.youtube.com/@ThaLilWhiteLie', sort_order: 4 },
+];
+
+export const siteInfo = {
+    about_text: `WH!TE L!E is a boundary-pushing artist blending raw energy with meticulously crafted soundscapes. Known for high-octane performances and a unique visual aesthetic, the music speaks to the chaotic beauty of modern life.\n\nHailing from the underground and rising to mainstream consciousness, WH!TE L!E continues to redefine what it means to be an independent creator in the digital age.`,
+    management_email: 'lilwhitelie1@gmail.com',
+    general_email: 'lilwhitelie1@gmail.com',
+};
+
 export const storeItems = [
     ...merch.map(m => ({ ...m, type: 'merch' as const })),
     ...albums.map(a => ({ ...a, type: 'album' as const })),
