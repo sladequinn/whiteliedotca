@@ -200,6 +200,16 @@ export const siteInfo = {
     "general_email": "lilwhitelie1@gmail.com"
 };
 
+export const upcomingShows: Array<{
+    id: string;
+    date: string;
+    title: string;
+    city: string;
+    blurb: string;
+    ticketUrl: string;
+    sort_order: number;
+}> = [];
+
 export const storeItems = [
     ...merch.map(m => ({ ...m, type: 'merch' as const })),
     ...albums.map(a => ({ ...a, type: 'album' as const })),

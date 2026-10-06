@@ -9,11 +9,12 @@ import HUD from './components/HUD';
 import StoreOverlay from './components/StoreOverlay';
 import LinksOverlay from './components/LinksOverlay';
 import InfoOverlay from './components/InfoOverlay';
+import ShowsOverlay from './components/ShowsOverlay';
 import AdminPanel from './components/admin/AdminPanel';
 
 export default function App() {
     const [isMuted, setIsMuted] = useState(true);
-    const [activeOverlay, setActiveOverlay] = useState<'none' | 'store' | 'links' | 'info' | 'admin'>('none');
+    const [activeOverlay, setActiveOverlay] = useState<'none' | 'store' | 'links' | 'info' | 'shows' | 'admin'>('none');
     const [activeCategory, setActiveCategory] = useState('featured');
     const [showUnmuteToast, setShowUnmuteToast] = useState(true);
     const [isGlitching, setIsGlitching] = useState(false);
@@ -75,7 +76,7 @@ export default function App() {
         }
     };
 
-    const handleToggleMenu = (menu: 'store' | 'links' | 'info') => {
+    const handleToggleMenu = (menu: 'store' | 'links' | 'info' | 'shows') => {
         setActiveOverlay(activeOverlay === menu ? 'none' : menu);
     };
 
@@ -136,6 +137,11 @@ export default function App() {
             <StoreOverlay 
                 isOpen={activeOverlay === 'store'} 
                 onClose={() => setActiveOverlay('none')} 
+            />
+
+            <ShowsOverlay
+                isOpen={activeOverlay === 'shows'}
+                onClose={() => setActiveOverlay('none')}
             />
 
             <AdminPanel

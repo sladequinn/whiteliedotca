@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { rawChannels as defaultRawChannels, albums as defaultAlbums, merch as defaultMerch, siteLinks as defaultLinks, siteInfo as defaultInfo } from '../data';
+import { rawChannels as defaultRawChannels, albums as defaultAlbums, merch as defaultMerch, siteLinks as defaultLinks, siteInfo as defaultInfo, upcomingShows as defaultShows } from '../data';
 import { generateDataTsCode, downloadDataFile } from '../utils/exportData';
 import { publishDataTsToGitHub } from '../utils/githubPublish';
 
@@ -56,6 +56,16 @@ export interface InfoItem {
   general_email: string;
 }
 
+export interface ShowItem {
+  id: string;
+  date: string;
+  title: string;
+  city: string;
+  blurb: string;
+  ticketUrl: string;
+  sort_order?: number;
+}
+
 export interface RawChannels {
   featured: string[];
   duets: string[];
@@ -70,6 +80,7 @@ interface AppDataContextType {
   merch: MerchItem[];
   links: LinkItem[];
   info: InfoItem;
+  shows: ShowItem[];
   isLoading: boolean;
   token: string | null;
   currentUser: string | null;
@@ -92,6 +103,7 @@ interface AppDataContextType {
   // Links & Info
   updateLinks: (links: LinkItem[]) => Promise<void>;
   updateInfo: (info: InfoItem) => Promise<void>;
+  updateShows: (shows: ShowItem[]) => Promise<void>;
   resetToDefaults: () => Promise<void>;
   exportToDataFile: () => Promise<void>;
   downloadDataFileLocal: () => void;
@@ -188,6 +200,17 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     return defaultInfo;
   });
 
+  const [shows, setShows] = useState<ShowItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_DATA_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed.shows)) return parsed.shows;
+      }
+    } catch {}
+    return defaultShows as ShowItem[];
+  });
+
   const [playlist, setPlaylist] = useState<PlaylistItem[]>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_DATA_KEY);
@@ -207,6 +230,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     merch?: MerchItem[];
     links?: LinkItem[];
     info?: InfoItem;
+    shows?: ShowItem[];
   }) => {
     try {
       const currentRaw = localStorage.getItem(LOCAL_STORAGE_DATA_KEY);
@@ -238,6 +262,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         if (data.merch) setMerch(data.merch);
         if (data.links) setLinks(data.links);
         if (data.info) setInfo(data.info);
+        if (data.shows) setShows(data.shows);
 
         // Also update local storage cache with freshest server data
         saveStateToLocalStorage({
@@ -247,6 +272,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           merch: data.merch,
           links: data.links,
           info: data.info,
+          shows: data.shows,
         });
       }
     } catch (err) {
@@ -536,6 +562,19 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     saveStateToLocalStorage({ info: newInfo });
   };
 
+  const updateShows = async (newShows: ShowItem[]) => {
+    try {
+      await fetch('/api/shows', {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ shows: newShows }),
+      });
+    } catch {}
+
+    setShows(newShows);
+    saveStateToLocalStorage({ shows: newShows });
+  };
+
   const resetToDefaults = async () => {
     try {
       await fetch('/api/reset', {
@@ -555,6 +594,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     setMerch(defaultMerch as MerchItem[]);
     setLinks(defaultLinks);
     setInfo(defaultInfo);
+    setShows(defaultShows as ShowItem[]);
     setPlaylist(buildPlaylist(defaultRawChannels));
   };
 
@@ -570,18 +610,18 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   };
 
   const getDataFileCode = useCallback(() => {
-    return generateDataTsCode({ channels, albums, merch, links, info });
-  }, [channels, albums, merch, links, info]);
+    return generateDataTsCode({ channels, albums, merch, links, info, shows });
+  }, [channels, albums, merch, links, info, shows]);
 
   const downloadDataFileLocal = useCallback(() => {
-    const code = generateDataTsCode({ channels, albums, merch, links, info });
+    const code = generateDataTsCode({ channels, albums, merch, links, info, shows });
     downloadDataFile('data.ts', code);
-  }, [channels, albums, merch, links, info]);
+  }, [channels, albums, merch, links, info, shows]);
 
   const publishToGitHub = useCallback(async () => {
-    const code = generateDataTsCode({ channels, albums, merch, links, info });
+    const code = generateDataTsCode({ channels, albums, merch, links, info, shows });
     return publishDataTsToGitHub(code);
-  }, [channels, albums, merch, links, info]);
+  }, [channels, albums, merch, links, info, shows]);
 
   return (
     <AppDataContext.Provider
@@ -593,6 +633,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         merch,
         links,
         info,
+        shows,
         isLoading,
         token,
         currentUser,
@@ -611,6 +652,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         deleteMerch,
         updateLinks,
         updateInfo,
+        updateShows,
         resetToDefaults,
         exportToDataFile,
         downloadDataFileLocal,

@@ -9,7 +9,7 @@ Here is a quick breakdown of what the most important files do:
 * **`src/App.tsx`** 
   The main application file. This controls the retro TV interface, the static noise transitions, and the channel surfing logic.
 * **`src/components/admin/`**
-  The Backstage Admin Panel. Allows White Lie to log in, add, edit, reorder, and delete video URLs, album releases, merchandise items, links, and artist bio.
+  The Admin Panel. Allows White Lie to log in, add, edit, reorder, and delete video URLs, album releases, merchandise items, upcoming shows, links, and artist bio.
 * **`server/`**
   Express API server and SQLite database (`whitelie.db`). Handles authenticated REST endpoints (`/api/auth/*`, `/api/videos/*`, `/api/albums/*`, `/api/merch/*`, `/api/links`, `/api/info`).
 * **`src/components/StoreOverlay.tsx`** 
@@ -23,10 +23,10 @@ Here is a quick breakdown of what the most important files do:
 * **`vite.config.ts`** 
   The configuration file for Vite, with integrated Express API middleware for seamless local and production dev.
 
-## 🔐 Backstage Admin Panel
+## 🔐 Admin Panel
 
 To access the admin panel:
-1. Click **`[BACKSTAGE]`** next to the **`WH!TE L!E`** logo in the bottom-left corner of the HUD, OR
+1. Click the small faded **`admin`** label under the mute button (top-right), OR
 2. Navigate to `http://localhost:3000/#admin` or `http://localhost:3000/?admin`
 
 **Default Credentials:**
@@ -38,8 +38,9 @@ To access the admin panel:
 * **Hosting Guide for Videos:** Helpful in-app guide explaining why videos are hosted externally via URLs (Cloudinary / S3 / R2) instead of committed to Git (which has file size limits and lacks video streaming chunking).
 * **Albums & Releases Manager:** Manage vinyl/cassette releases, front & back artwork URLs, descriptions, prices, Pre-Order & Sold Out badges, Spotify links, and Stripe checkout buttons.
 * **Apparel & Merch Manager:** Manage shirts, hoodies, prices, front & back 3D garment artwork, and Stripe payment links.
+* **Upcoming Shows:** Add dates, venues, a short blurb, and a ticket link. The public **SHOWS** button on the home HUD opens that list.
 * **Links & Bio Manager:** Update all external streaming/social links (Spotify, Apple Music, TikTok, Instagram, YouTube) and artist contact/bio copy.
-* **GitHub Auto-Publish:** Paste a GitHub Personal Access Token once in the Security tab, then click **PUBLISH TO SITE**. Backstage commits `src/data.ts` to GitHub automatically. Vercel then rebuilds `whitelie.ca` — no downloading, copying, or manual git push.
+* **GitHub Auto-Publish:** Paste a GitHub Personal Access Token once in the Security tab, then click **PUBLISH TO SITE**. Admin commits `src/data.ts` to GitHub automatically. Vercel then rebuilds `whitelie.ca` — no downloading, copying, or manual git push.
 * **GitHub Sync & Static Export:** Fallback tools remain: **"DOWNLOAD DATA.TS"** and **"COPY CODE"** if you ever want to commit by hand.
 * **Hybrid Storage & Offline Resilience:** Edits are automatically saved to browser storage (`localStorage`) as well as the database, allowing full editing capabilities even when deployed on static servers like Vercel or GitHub Pages without a backend running.
 * **Security & Factory Reset:** Update admin password securely (scrypt hash on server, WebCrypto PBKDF2 in browser) and reset back to original seed data with one click if needed.
@@ -76,4 +77,4 @@ Because Vercel is a static host, database edits on the live site live in the bro
 
 Fine-grained tokens are harder: GitHub has no “Write” permission (use **Contents → Read and write**), and it shows *“This token does not have access to any repositories”* until `whiteliedotca` appears as a selected chip under the dropdown — typing the name is not enough.
 
-There is also a **PUBLISH** button in the Backstage header after you are logged in.
+There is also a **PUBLISH** button in the Admin header after you are logged in.
