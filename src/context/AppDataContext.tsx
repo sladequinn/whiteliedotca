@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { rawChannels as defaultRawChannels, albums as defaultAlbums, merch as defaultMerch } from '../data';
+import { rawChannels as defaultRawChannels, albums as defaultAlbums, merch as defaultMerch, siteLinks as defaultLinks, siteInfo as defaultInfo } from '../data';
 import { generateDataTsCode, downloadDataFile } from '../utils/exportData';
+import { publishDataTsToGitHub } from '../utils/githubPublish';
 
 export interface VideoItem {
   id: string;
@@ -95,21 +96,8 @@ interface AppDataContextType {
   exportToDataFile: () => Promise<void>;
   downloadDataFileLocal: () => void;
   getDataFileCode: () => string;
+  publishToGitHub: () => Promise<{ commitUrl?: string; htmlUrl?: string }>;
 }
-
-const defaultLinks: LinkItem[] = [
-  { id: 'spotify', title: 'SPOTIFY', url: 'https://open.spotify.com/artist/6IgPg8MO2tPuQFHcM6MF4o' },
-  { id: 'applemusic', title: 'APPLE MUSIC', url: 'https://music.apple.com/ca/artist/lil-white-lie/1496696984' },
-  { id: 'tiktok', title: 'TIKTOK', url: 'https://www.tiktok.com/@whitelie519' },
-  { id: 'instagram', title: 'INSTAGRAM', url: 'https://www.instagram.com/lilwhitelie519' },
-  { id: 'youtube', title: 'YOUTUBE', url: 'https://www.youtube.com/@ThaLilWhiteLie' },
-];
-
-const defaultInfo: InfoItem = {
-  about_text: `WH!TE L!E is a boundary-pushing artist blending raw energy with meticulously crafted soundscapes. Known for high-octane performances and a unique visual aesthetic, the music speaks to the chaotic beauty of modern life.\n\nHailing from the underground and rising to mainstream consciousness, WH!TE L!E continues to redefine what it means to be an independent creator in the digital age.`,
-  management_email: 'lilwhitelie1@gmail.com',
-  general_email: 'lilwhitelie1@gmail.com',
-};
 
 function buildPlaylist(channels: RawChannels): PlaylistItem[] {
   const shuffle = <T,>(array: T[]): T[] => [...array].sort(() => Math.random() - 0.5);
@@ -194,7 +182,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const saved = localStorage.getItem(LOCAL_STORAGE_DATA_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.info) return parsed.info;
+        if (parsed.info && !Array.isArray(parsed.info)) return parsed.info;
       }
     } catch {}
     return defaultInfo;
@@ -218,7 +206,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     albums?: AlbumItem[];
     merch?: MerchItem[];
     links?: LinkItem[];
-    info?: InfoItem[];
+    info?: InfoItem;
   }) => {
     try {
       const currentRaw = localStorage.getItem(LOCAL_STORAGE_DATA_KEY);
@@ -545,7 +533,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     } catch {}
 
     setInfo(newInfo);
-    saveStateToLocalStorage({ info: [newInfo] as any });
+    saveStateToLocalStorage({ info: newInfo });
   };
 
   const resetToDefaults = async () => {
@@ -582,13 +570,18 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   };
 
   const getDataFileCode = useCallback(() => {
-    return generateDataTsCode(channels, albums, merch);
-  }, [channels, albums, merch]);
+    return generateDataTsCode({ channels, albums, merch, links, info });
+  }, [channels, albums, merch, links, info]);
 
   const downloadDataFileLocal = useCallback(() => {
-    const code = generateDataTsCode(channels, albums, merch);
+    const code = generateDataTsCode({ channels, albums, merch, links, info });
     downloadDataFile('data.ts', code);
-  }, [channels, albums, merch]);
+  }, [channels, albums, merch, links, info]);
+
+  const publishToGitHub = useCallback(async () => {
+    const code = generateDataTsCode({ channels, albums, merch, links, info });
+    return publishDataTsToGitHub(code);
+  }, [channels, albums, merch, links, info]);
 
   return (
     <AppDataContext.Provider
@@ -622,6 +615,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         exportToDataFile,
         downloadDataFileLocal,
         getDataFileCode,
+        publishToGitHub,
       }}
     >
       {children}

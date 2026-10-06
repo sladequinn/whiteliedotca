@@ -16,7 +16,8 @@ import {
   ExternalLink, 
   X,
   Radio,
-  Eye
+  Eye,
+  Rocket
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -27,8 +28,25 @@ interface AdminPanelProps {
 type TabKey = 'videos' | 'albums' | 'merch' | 'links' | 'security';
 
 export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
-  const { token, currentUser, logout, videos, albums, merch } = useAppData();
+  const { token, currentUser, logout, videos, albums, merch, publishToGitHub } = useAppData();
   const [activeTab, setActiveTab] = useState<TabKey>('videos');
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishNote, setPublishNote] = useState<string | null>(null);
+
+  const handleHeaderPublish = async () => {
+    setIsPublishing(true);
+    setPublishNote(null);
+    try {
+      const result = await publishToGitHub();
+      setPublishNote(result.commitUrl ? 'Published — Vercel is rebuilding the live site.' : 'Published to GitHub.');
+      setTimeout(() => setPublishNote(null), 5000);
+    } catch (err: any) {
+      setActiveTab('security');
+      alert(err.message || 'Publish failed. Open SECURITY to add a GitHub token.');
+    } finally {
+      setIsPublishing(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -57,9 +75,15 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
 
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {token && (
-            <span className="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 border border-white/20 bg-zinc-900 text-zinc-300">
-              {token.startsWith('static_') ? 'STATIC MODE' : 'SERVER MODE'}
-            </span>
+            <button
+              onClick={handleHeaderPublish}
+              disabled={isPublishing}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-cyan-400 text-black hover:bg-white text-[10px] sm:text-xs font-black uppercase tracking-wider transition-colors disabled:opacity-50"
+              title="Commit src/data.ts to GitHub so Vercel rebuilds the live site"
+            >
+              <Rocket size={13} />
+              <span className="hidden sm:inline">{isPublishing ? 'PUSHING...' : publishNote ? 'PUBLISHED' : 'PUBLISH'}</span>
+            </button>
           )}
 
           <button
@@ -185,7 +209,8 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
 
             <div className="hidden md:block pt-4 border-t border-white/10 text-[10px] font-mono text-zinc-500">
               <div className="mb-1 text-zinc-400 font-bold">WH!TE L!E 519</div>
-              <div>Changes apply immediately to live viewers.</div>
+              <div>Edit here, then hit PUBLISH to push live.</div>
+              {publishNote && <div className="text-cyan-400 mt-1">{publishNote}</div>}
             </div>
           </aside>
 

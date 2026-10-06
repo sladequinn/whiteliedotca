@@ -39,7 +39,8 @@ To access the admin panel:
 * **Albums & Releases Manager:** Manage vinyl/cassette releases, front & back artwork URLs, descriptions, prices, Pre-Order & Sold Out badges, Spotify links, and Stripe checkout buttons.
 * **Apparel & Merch Manager:** Manage shirts, hoodies, prices, front & back 3D garment artwork, and Stripe payment links.
 * **Links & Bio Manager:** Update all external streaming/social links (Spotify, Apple Music, TikTok, Instagram, YouTube) and artist contact/bio copy.
-* **GitHub Sync & Static Export:** Full static host support (Vercel & GitHub Pages)! Use the one-click server sync when running Node, or click **"DOWNLOAD DATA.TS"** or **"COPY CODE"** directly in your browser on static deployments to update `src/data.ts`.
+* **GitHub Auto-Publish:** Paste a GitHub Personal Access Token once in the Security tab, then click **PUBLISH TO SITE**. Backstage commits `src/data.ts` to GitHub automatically. Vercel then rebuilds `whitelie.ca` — no downloading, copying, or manual git push.
+* **GitHub Sync & Static Export:** Fallback tools remain: **"DOWNLOAD DATA.TS"** and **"COPY CODE"** if you ever want to commit by hand.
 * **Hybrid Storage & Offline Resilience:** Edits are automatically saved to browser storage (`localStorage`) as well as the database, allowing full editing capabilities even when deployed on static servers like Vercel or GitHub Pages without a backend running.
 * **Security & Factory Reset:** Update admin password securely (scrypt hash on server, WebCrypto PBKDF2 in browser) and reset back to original seed data with one click if needed.
 * **Mobile-Optimized:** Fully responsive on phones and tablets with sticky top header, horizontal touch-scrolling tabs, enlarged touch targets, safe-area padding, and font scaling to prevent auto-zoom on iOS.
@@ -61,3 +62,15 @@ Once this code is on GitHub, the easiest way to get it live on the internet is t
 2. Click "Add New Project" and select your GitHub repository.
 3. The platform will automatically detect that it's a Vite/React app.
 4. Click "Deploy" and it will give you a live URL in a few minutes!
+
+### Publishing content changes from Backstage
+
+Because Vercel is a static host, database edits on the live site live in the browser until you publish:
+
+1. Open `#admin` → **SECURITY**
+2. Create a GitHub Fine-grained token with **Contents: Read and write** on `sladequinn/whiteliedotca`
+3. Paste the token (stored only in this browser)
+4. Click **PUBLISH TO SITE**
+5. Wait ~1 minute for Vercel to rebuild `whitelie.ca`
+
+There is also a **PUBLISH** button in the Backstage header after you are logged in.

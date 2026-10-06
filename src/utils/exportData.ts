@@ -1,9 +1,55 @@
-// Helpers to generate src/data.ts content and trigger downloads / clipboard copies
+export interface DataFileChannels {
+  featured: string[];
+  duets: string[];
+  munchtime: string[];
+}
 
-import { VideoItem, AlbumItem, MerchItem, RawChannels } from '../context/AppDataContext';
+export interface DataFileAlbum {
+  title: string;
+  front: string;
+  back: string;
+  blurb: string;
+  price: number;
+  isPreorder?: boolean;
+  isSoldOut?: boolean;
+  stripeUrl?: string;
+  spotify?: string;
+}
 
-export function generateDataTsCode(channels: RawChannels, albums: AlbumItem[], merch: MerchItem[]): string {
-  const formattedAlbums = albums.map(a => ({
+export interface DataFileMerch {
+  id: string;
+  title: string;
+  type: string;
+  front: string;
+  back: string;
+  blurb: string;
+  price: number;
+  stripeUrl?: string;
+}
+
+export interface DataFileLink {
+  id: string;
+  title: string;
+  url: string;
+  sort_order?: number;
+}
+
+export interface DataFileInfo {
+  about_text: string;
+  management_email: string;
+  general_email: string;
+}
+
+export interface DataFilePayload {
+  channels: DataFileChannels;
+  albums: DataFileAlbum[];
+  merch: DataFileMerch[];
+  links: DataFileLink[];
+  info: DataFileInfo;
+}
+
+export function generateDataTsCode(payload: DataFilePayload): string {
+  const formattedAlbums = payload.albums.map(a => ({
     title: a.title,
     front: a.front,
     back: a.back,
@@ -15,7 +61,7 @@ export function generateDataTsCode(channels: RawChannels, albums: AlbumItem[], m
     ...(a.spotify ? { spotify: a.spotify } : {}),
   }));
 
-  const formattedMerch = merch.map(m => ({
+  const formattedMerch = payload.merch.map(m => ({
     id: m.id,
     title: m.title,
     type: m.type,
@@ -26,9 +72,18 @@ export function generateDataTsCode(channels: RawChannels, albums: AlbumItem[], m
     ...(m.stripeUrl ? { stripeUrl: m.stripeUrl } : {}),
   }));
 
-  return `export const rawChannels = ${JSON.stringify(channels, null, 4)};\n\n` +
+  const formattedLinks = payload.links.map((link, idx) => ({
+    id: link.id,
+    title: link.title,
+    url: link.url,
+    sort_order: link.sort_order ?? idx,
+  }));
+
+  return `export const rawChannels = ${JSON.stringify(payload.channels, null, 4)};\n\n` +
     `export const albums = ${JSON.stringify(formattedAlbums, null, 4)};\n\n` +
     `export const merch = ${JSON.stringify(formattedMerch, null, 4)};\n\n` +
+    `export const siteLinks = ${JSON.stringify(formattedLinks, null, 4)};\n\n` +
+    `export const siteInfo = ${JSON.stringify(payload.info, null, 4)};\n\n` +
     `export const storeItems = [\n` +
     `    ...merch.map(m => ({ ...m, type: 'merch' as const })),\n` +
     `    ...albums.map(a => ({ ...a, type: 'album' as const })),\n` +

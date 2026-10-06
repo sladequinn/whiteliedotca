@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { db, hashPassword, verifyPassword, initDatabase } from './db.js';
+import { generateDataTsCode } from '../src/utils/exportData.js';
 
 export const router = Router();
 
@@ -455,6 +456,8 @@ router.post('/export-to-data-file', requireAuth, (_req, res) => {
     }>;
     const albums = db.prepare('SELECT * FROM albums ORDER BY sort_order ASC').all() as Array<any>;
     const merch = db.prepare('SELECT * FROM merch ORDER BY sort_order ASC').all() as Array<any>;
+    const links = db.prepare('SELECT * FROM links ORDER BY sort_order ASC').all() as Array<any>;
+    const info = db.prepare("SELECT * FROM info WHERE id = 'main'").get() as any;
 
     const channels = {
       featured: videos.filter(v => v.category === 'featured').map(v => v.url),
@@ -485,19 +488,26 @@ router.post('/export-to-data-file', requireAuth, (_req, res) => {
       ...(m.stripe_url ? { stripeUrl: m.stripe_url } : {}),
     }));
 
-    const fileContent = `export const rawChannels = ${JSON.stringify(channels, null, 4)};\n\n` +
-      `export const albums = ${JSON.stringify(formattedAlbums, null, 4)};\n\n` +
-      `export const merch = ${JSON.stringify(formattedMerch, null, 4)};\n\n` +
-      `export const storeItems = [\n` +
-      `    ...merch.map(m => ({ ...m, type: 'merch' as const })),\n` +
-      `    ...albums.map(a => ({ ...a, type: 'album' as const })),\n` +
-      `];\n\n` +
-      `const shuffle = <T>(array: T[]): T[] => [...array].sort(() => Math.random() - 0.5);\n\n` +
-      `export const playlist = [\n` +
-      `    ...rawChannels.featured.map((url, i) => ({ id: \`feat-\${i}\`, url, category: 'featured' })),\n` +
-      `    ...shuffle(rawChannels.duets).map((url, i) => ({ id: \`duet-\${i}\`, url, category: 'duets' })),\n` +
-      `    ...shuffle(rawChannels.munchtime).map((url, i) => ({ id: \`munch-\${i}\`, url, category: 'munchtime' }))\n` +
-      `];\n`;
+    const formattedLinks = links.map((link: any, idx: number) => ({
+      id: link.id,
+      title: link.title,
+      url: link.url,
+      sort_order: link.sort_order ?? idx,
+    }));
+
+    const formattedInfo = {
+      about_text: info?.about_text || '',
+      management_email: info?.management_email || '',
+      general_email: info?.general_email || '',
+    };
+
+    const fileContent = generateDataTsCode({
+      channels,
+      albums: formattedAlbums,
+      merch: formattedMerch,
+      links: formattedLinks,
+      info: formattedInfo,
+    });
 
     const dataPath = path.resolve(process.cwd(), 'src/data.ts');
     fs.writeFileSync(dataPath, fileContent, 'utf-8');
