@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppData } from '../../context/AppDataContext';
-import { KeyRound, RotateCcw, Check, AlertCircle, ShieldAlert, GitBranch, Download, FileCode, Copy, Rocket, Eye, EyeOff, Plug } from 'lucide-react';
+import { KeyRound, RotateCcw, Check, AlertCircle, ShieldAlert, Rocket, Eye, EyeOff, Plug } from 'lucide-react';
 import { changePasswordLocal } from '../../utils/localAuth';
 import {
   loadGitHubConfig,
@@ -10,7 +10,7 @@ import {
 } from '../../utils/githubPublish';
 
 export default function SecuritySettings() {
-  const { token, resetToDefaults, exportToDataFile, downloadDataFileLocal, getDataFileCode, publishToGitHub } = useAppData();
+  const { token, resetToDefaults, publishToGitHub } = useAppData();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -19,10 +19,6 @@ export default function SecuritySettings() {
 
   const [isResetting, setIsResetting] = useState(false);
   const [resetToast, setResetToast] = useState<string | null>(null);
-
-  const [isExporting, setIsExporting] = useState(false);
-  const [exportToast, setExportToast] = useState<string | null>(null);
-  const [copiedCode, setCopiedCode] = useState(false);
 
   const savedGithub = loadGitHubConfig();
   const [githubConfig, setGithubConfig] = useState<GitHubPublishConfig>(savedGithub);
@@ -88,33 +84,6 @@ export default function SecuritySettings() {
       setPassToast({ type: 'error', msg: err.message || 'Error changing password' });
     } finally {
       setIsChangingPass(false);
-    }
-  };
-
-  const handleExportData = async () => {
-    setIsExporting(true);
-    try {
-      await exportToDataFile();
-      setExportToast('Synced! Current database has been written to src/data.ts on the server.');
-      setTimeout(() => setExportToast(null), 5000);
-    } catch (err: any) {
-      // On static hosting, fallback to downloading file directly
-      downloadDataFileLocal();
-      setExportToast('Downloaded data.ts file! (Server API is in static mode on Vercel/GitHub)');
-      setTimeout(() => setExportToast(null), 5000);
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  const handleCopyCode = async () => {
-    try {
-      const code = getDataFileCode();
-      await navigator.clipboard.writeText(code);
-      setCopiedCode(true);
-      setTimeout(() => setCopiedCode(false), 3000);
-    } catch {
-      alert('Unable to copy to clipboard automatically.');
     }
   };
 
@@ -295,56 +264,6 @@ export default function SecuritySettings() {
             className="w-full sm:w-auto bg-zinc-900 border border-white/20 text-white hover:bg-white hover:text-black px-4 py-2.5 text-xs font-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <Plug size={14} /> {isTestingGithub ? 'TESTING...' : 'TEST CONNECTION'}
-          </button>
-        </div>
-      </div>
-
-      {/* GITHUB SYNC / STATIC HOSTING EXPORT */}
-      <div className="border border-white/15 bg-zinc-950/80 p-4 md:p-6 space-y-3 md:space-y-4">
-        <div className="flex items-center gap-2 text-cyan-400 font-mono text-[10px] md:text-xs uppercase tracking-widest font-black">
-          <GitBranch size={16} /> GITHUB / STATIC HOSTING SYNC
-        </div>
-
-        <h3 className="text-xs md:text-sm font-black uppercase tracking-widest text-white font-mono">
-          SYNC CHANGES TO SRC/DATA.TS (FOR GITHUB DEPLOYS)
-        </h3>
-
-        <p className="text-[11px] md:text-xs text-zinc-400 font-mono leading-relaxed">
-          Hosting on GitHub Pages, Netlify, or Vercel? Click this button to save all your latest videos, 
-          albums, and merch changes directly into <code className="text-white font-mono bg-zinc-900 px-1 py-0.5">src/data.ts</code>. 
-          That way, your edits are preserved in git and built into static production bundles.
-        </p>
-
-        {exportToast && (
-          <div className="p-3 bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 text-xs font-mono flex items-center gap-2">
-            <Check size={16} /> {exportToast}
-          </div>
-        )}
-
-        <div className="flex flex-wrap gap-2.5">
-          <button
-            onClick={handleExportData}
-            disabled={isExporting}
-            className="w-full sm:w-auto bg-white text-black hover:bg-cyan-400 hover:text-black px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            <FileCode size={14} /> {isExporting ? 'SYNCING...' : 'SYNC ALL CHANGES TO SRC/DATA.TS'}
-          </button>
-
-          <button
-            onClick={downloadDataFileLocal}
-            className="w-full sm:w-auto bg-zinc-900 border border-white/20 text-white hover:bg-white hover:text-black px-4 py-2.5 text-xs font-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
-            title="Download data.ts file to your device"
-          >
-            <Download size={14} /> DOWNLOAD DATA.TS
-          </button>
-
-          <button
-            onClick={handleCopyCode}
-            className="w-full sm:w-auto bg-zinc-900 border border-white/20 text-white hover:bg-white hover:text-black px-4 py-2.5 text-xs font-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
-            title="Copy code to clipboard"
-          >
-            {copiedCode ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-            {copiedCode ? 'COPIED CODE!' : 'COPY CODE'}
           </button>
         </div>
       </div>

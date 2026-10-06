@@ -40,8 +40,7 @@ To access the admin panel:
 * **Apparel & Merch Manager:** Manage shirts, hoodies, prices, front & back 3D garment artwork, and Stripe payment links.
 * **Upcoming Shows:** Add dates, venues, a short blurb, and a ticket link. The public **SHOWS** button on the home HUD opens that list.
 * **Links & Bio Manager:** Update all external streaming/social links (Spotify, Apple Music, TikTok, Instagram, YouTube) and artist contact/bio copy.
-* **GitHub Auto-Publish:** Paste a GitHub Personal Access Token once in the Security tab, then click **PUBLISH TO SITE**. Admin commits `src/data.ts` to GitHub automatically. Vercel then rebuilds `whitelie.ca` — no downloading, copying, or manual git push.
-* **GitHub Sync & Static Export:** Fallback tools remain: **"DOWNLOAD DATA.TS"** and **"COPY CODE"** if you ever want to commit by hand.
+* **GitHub Auto-Publish:** Paste a GitHub Personal Access Token once in the Security tab, then click **PUBLISH TO SITE**. Admin commits `src/data.ts` to GitHub automatically. Vercel then rebuilds `whitelie.ca`.
 * **Hybrid Storage & Offline Resilience:** Edits are automatically saved to browser storage (`localStorage`) as well as the database, allowing full editing capabilities even when deployed on static servers like Vercel or GitHub Pages without a backend running.
 * **Security & Factory Reset:** Update admin password securely (scrypt hash on server, WebCrypto PBKDF2 in browser) and reset back to original seed data with one click if needed.
 * **Mobile-Optimized:** Fully responsive on phones and tablets with sticky top header, horizontal touch-scrolling tabs, enlarged touch targets, safe-area padding, and font scaling to prevent auto-zoom on iOS.
