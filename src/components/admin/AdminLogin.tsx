@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppData } from '../../context/AppDataContext';
-import { Lock, ArrowRight, ShieldCheck, Sparkles, AlertCircle } from 'lucide-react';
+import { Lock, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
 import { authenticateLocal } from '../../utils/localAuth';
 
 interface AdminLoginProps {
@@ -71,13 +71,13 @@ export default function AdminLogin({ onSuccess }: AdminLoginProps) {
         
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-2 text-[10px] sm:text-xs font-mono uppercase tracking-[0.3em] text-red-500 mb-2">
-            <Lock size={14} /> Backstage Access
+            <Lock size={14} /> Admin Access
           </div>
           <h2 className="text-2xl sm:text-4xl italic font-black tracking-tighter leading-none text-white">
             WH!TE L!E ADMIN
           </h2>
           <p className="text-[11px] sm:text-xs text-zinc-400 mt-2 font-mono">
-            Control center for videos, store merchandise, links & bio.
+            Control center for videos, store, shows, links & bio.
           </p>
         </div>
 
@@ -104,14 +104,9 @@ export default function AdminLogin({ onSuccess }: AdminLoginProps) {
           </div>
 
           <div>
-            <div className="flex justify-between items-center mb-1.5">
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-400 font-mono">
-                Password
-              </label>
-              <span className="text-[10px] font-mono text-zinc-500">
-                Default: whitelie519
-              </span>
-            </div>
+            <label className="block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1.5 font-mono">
+              Password
+            </label>
             <input
               type="password"
               value={password}
@@ -132,7 +127,7 @@ export default function AdminLogin({ onSuccess }: AdminLoginProps) {
               <span>AUTHENTICATING...</span>
             ) : (
               <>
-                <span>ENTER BACKSTAGE</span>
+                <span>LOG IN</span>
                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </>
             )}

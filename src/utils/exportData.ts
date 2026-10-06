@@ -40,12 +40,23 @@ export interface DataFileInfo {
   general_email: string;
 }
 
+export interface DataFileShow {
+  id: string;
+  date: string;
+  title: string;
+  city: string;
+  blurb: string;
+  ticketUrl: string;
+  sort_order?: number;
+}
+
 export interface DataFilePayload {
   channels: DataFileChannels;
   albums: DataFileAlbum[];
   merch: DataFileMerch[];
   links: DataFileLink[];
   info: DataFileInfo;
+  shows?: DataFileShow[];
 }
 
 export function generateDataTsCode(payload: DataFilePayload): string {
@@ -79,11 +90,22 @@ export function generateDataTsCode(payload: DataFilePayload): string {
     sort_order: link.sort_order ?? idx,
   }));
 
+  const formattedShows = (payload.shows || []).map((show, idx) => ({
+    id: show.id,
+    date: show.date || '',
+    title: show.title || '',
+    city: show.city || '',
+    blurb: show.blurb || '',
+    ticketUrl: show.ticketUrl || '',
+    sort_order: show.sort_order ?? idx,
+  }));
+
   return `export const rawChannels = ${JSON.stringify(payload.channels, null, 4)};\n\n` +
     `export const albums = ${JSON.stringify(formattedAlbums, null, 4)};\n\n` +
     `export const merch = ${JSON.stringify(formattedMerch, null, 4)};\n\n` +
     `export const siteLinks = ${JSON.stringify(formattedLinks, null, 4)};\n\n` +
     `export const siteInfo = ${JSON.stringify(payload.info, null, 4)};\n\n` +
+    `export const upcomingShows = ${JSON.stringify(formattedShows, null, 4)};\n\n` +
     `export const storeItems = [\n` +
     `    ...merch.map(m => ({ ...m, type: 'merch' as const })),\n` +
     `    ...albums.map(a => ({ ...a, type: 'album' as const })),\n` +

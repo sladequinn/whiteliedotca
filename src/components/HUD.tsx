@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Volume2, VolumeX, ShieldAlert } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface HUDProps {
     activeCategory: string;
     onCategorySelect: (category: string) => void;
-    onToggleMenu: (menu: 'store' | 'links' | 'info') => void;
+    onToggleMenu: (menu: 'store' | 'links' | 'info' | 'shows') => void;
     onOpenAdmin?: () => void;
     isMuted: boolean;
     onToggleMute: () => void;
@@ -131,7 +131,7 @@ export default function HUD({
             </nav>
 
             {/* MUTE TOGGLE (TOP RIGHT) */}
-            <div className="absolute top-10 right-6 z-[100] pointer-events-auto">
+            <div className="absolute top-10 right-6 z-[100] pointer-events-auto flex flex-col items-end gap-2">
                 <button 
                     onClick={onToggleMute}
                     className="p-2 bg-black/40 backdrop-blur-md rounded-full border border-white/20 hover:bg-white/20 transition-colors"
@@ -139,6 +139,15 @@ export default function HUD({
                 >
                     {isMuted ? <VolumeX size={20} className="text-white" /> : <Volume2 size={20} className="text-white" />}
                 </button>
+                {onOpenAdmin && (
+                    <button
+                        onClick={onOpenAdmin}
+                        className="text-[8px] font-mono uppercase tracking-[0.25em] text-white/20 hover:text-white/50 transition-colors pr-0.5"
+                        title="Admin"
+                    >
+                        admin
+                    </button>
+                )}
             </div>
 
             {/* THE ACTIONS (BOTTOM RIGHT) */}
@@ -148,6 +157,12 @@ export default function HUD({
                     className="bg-white text-black px-6 py-3 text-[11px] font-black uppercase tracking-widest pointer-events-auto hover:invert transition-all shadow-[0_0_15px_rgba(255,255,255,0.3)]"
                 >
                     STORE
+                </button>
+                <button 
+                    onClick={() => onToggleMenu('shows')} 
+                    className="bg-white text-black px-6 py-3 text-[11px] font-black uppercase tracking-widest pointer-events-auto hover:invert transition-all shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                >
+                    SHOWS
                 </button>
                 <div className="flex gap-3 pointer-events-auto">
                     <button 
@@ -166,22 +181,13 @@ export default function HUD({
             </div>
 
             {/* THE BRAND (BOTTOM LEFT) */}
-            <div className="absolute bottom-10 left-6 z-[100] hud-shadow pointer-events-auto flex items-baseline gap-2.5">
+            <div className="absolute bottom-10 left-6 z-[100] hud-shadow pointer-events-auto">
                 <h1 
                     onClick={() => setClickCount(c => c + 1)}
                     className="text-4xl sm:text-5xl italic font-black tracking-tighter leading-none cursor-pointer select-none hover:text-red-500 transition-colors duration-300"
                 >
                     WH!TE L!E
                 </h1>
-                {onOpenAdmin && (
-                    <button
-                        onClick={onOpenAdmin}
-                        className="text-[10px] sm:text-[9px] font-mono tracking-widest text-zinc-400 sm:text-zinc-500 hover:text-red-400 hover:underline transition-colors uppercase px-1.5 py-1 bg-black/40 backdrop-blur-sm sm:bg-transparent border border-white/10 sm:border-transparent rounded-sm"
-                        title="Backstage Admin Panel"
-                    >
-                        [BACKSTAGE]
-                    </button>
-                )}
             </div>
         </>
     );

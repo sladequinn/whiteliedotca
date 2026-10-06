@@ -5,15 +5,16 @@ import VideoManager from './VideoManager';
 import StoreManager from './StoreManager';
 import MerchManager from './MerchManager';
 import LinksBioManager from './LinksBioManager';
+import ShowsManager from './ShowsManager';
 import SecuritySettings from './SecuritySettings';
 import { 
   Film, 
   Disc, 
   ShoppingBag, 
   Globe, 
+  CalendarDays,
   KeyRound, 
   LogOut, 
-  ExternalLink, 
   X,
   Radio,
   Eye,
@@ -25,10 +26,10 @@ interface AdminPanelProps {
   onClose: () => void;
 }
 
-type TabKey = 'videos' | 'albums' | 'merch' | 'links' | 'security';
+type TabKey = 'videos' | 'albums' | 'merch' | 'shows' | 'links' | 'security';
 
 export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
-  const { token, currentUser, logout, videos, albums, merch, publishToGitHub } = useAppData();
+  const { token, currentUser, logout, videos, albums, merch, shows, publishToGitHub } = useAppData();
   const [activeTab, setActiveTab] = useState<TabKey>('videos');
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishNote, setPublishNote] = useState<string | null>(null);
@@ -61,7 +62,7 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <Radio className="text-red-500 animate-pulse" size={16} />
             <h1 className="text-lg sm:text-2xl font-black italic tracking-tighter truncate">
-              WH!TE L!E <span className="text-red-500 text-xs sm:text-lg">// BACKSTAGE</span>
+              WH!TE L!E <span className="text-red-500 text-xs sm:text-lg">// ADMIN</span>
             </h1>
           </div>
 
@@ -183,6 +184,25 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
               </button>
 
               <button
+                onClick={() => setActiveTab('shows')}
+                className={`flex-1 md:flex-initial flex items-center justify-between px-3 py-2 md:p-3 text-left font-mono text-[11px] md:text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap shrink-0 ${
+                  activeTab === 'shows'
+                    ? 'bg-white text-black shadow'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <CalendarDays size={15} />
+                  <span>SHOWS</span>
+                </div>
+                <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${
+                  activeTab === 'shows' ? 'bg-black text-white' : 'bg-zinc-800 text-zinc-300'
+                }`}>
+                  {shows.length}
+                </span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab('links')}
                 className={`flex-1 md:flex-initial flex items-center gap-2 px-3 py-2 md:p-3 text-left font-mono text-[11px] md:text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap shrink-0 ${
                   activeTab === 'links'
@@ -220,6 +240,7 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
               {activeTab === 'videos' && <VideoManager />}
               {activeTab === 'albums' && <StoreManager />}
               {activeTab === 'merch' && <MerchManager />}
+              {activeTab === 'shows' && <ShowsManager />}
               {activeTab === 'links' && <LinksBioManager />}
               {activeTab === 'security' && <SecuritySettings />}
             </div>

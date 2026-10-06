@@ -2,7 +2,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
-import { rawChannels, albums, merch } from '../src/data.js';
+import { rawChannels, albums, merch, upcomingShows } from '../src/data.js';
 
 const DB_DIR = path.resolve(process.cwd(), 'data');
 if (!fs.existsSync(DB_DIR)) {
@@ -98,6 +98,16 @@ export function initDatabase() {
       about_text TEXT NOT NULL,
       management_email TEXT NOT NULL,
       general_email TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS shows (
+      id TEXT PRIMARY KEY,
+      date TEXT NOT NULL DEFAULT '',
+      title TEXT NOT NULL DEFAULT '',
+      city TEXT NOT NULL DEFAULT '',
+      blurb TEXT NOT NULL DEFAULT '',
+      ticket_url TEXT NOT NULL DEFAULT '',
+      sort_order INTEGER NOT NULL DEFAULT 0
     );
   `);
 
@@ -218,5 +228,36 @@ export function initDatabase() {
       INSERT INTO info (id, about_text, management_email, general_email)
       VALUES ('main', ?, 'lilwhitelie1@gmail.com', 'lilwhitelie1@gmail.com')
     `).run(aboutText);
+  }
+
+  const showCount = db.prepare('SELECT COUNT(*) as count FROM shows').get() as { count: number };
+  const seededShows = upcomingShows as Array<{
+    id?: string;
+    date?: string;
+    title?: string;
+    city?: string;
+    blurb?: string;
+    ticketUrl?: string;
+    sort_order?: number;
+  }>;
+  if (showCount.count === 0 && seededShows.length > 0) {
+    const insertShow = db.prepare(`
+      INSERT INTO shows (id, date, title, city, blurb, ticket_url, sort_order)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+    const seedShows = db.transaction(() => {
+      seededShows.forEach((show, idx) => {
+        insertShow.run(
+          show.id || `show-${idx}`,
+          show.date || '',
+          show.title || '',
+          show.city || '',
+          show.blurb || '',
+          show.ticketUrl || '',
+          show.sort_order ?? idx
+        );
+      });
+    });
+    seedShows();
   }
 }

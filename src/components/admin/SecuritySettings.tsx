@@ -160,7 +160,7 @@ export default function SecuritySettings() {
   };
 
   const handleResetData = async () => {
-    if (!confirm('WARNING: This will reset all videos, albums, merch, and links back to the original hardcoded defaults from data.ts. Are you sure?')) {
+    if (!confirm('WARNING: This will reset all videos, albums, merch, shows, and links back to the original hardcoded defaults from data.ts. Are you sure?')) {
       return;
     }
 
@@ -200,7 +200,7 @@ export default function SecuritySettings() {
 
         <p className="text-[11px] md:text-xs text-zinc-400 font-mono leading-relaxed">
           Paste a GitHub token once. After that, <strong className="text-white">PUBLISH TO SITE</strong> commits
-          videos, albums, merch, links, and bio into <code className="text-white bg-zinc-900 px-1 py-0.5">src/data.ts</code>.
+          videos, albums, merch, shows, links, and bio into <code className="text-white bg-zinc-900 px-1 py-0.5">src/data.ts</code>.
           Vercel watches GitHub and rebuilds <code className="text-white bg-zinc-900 px-1 py-0.5">whitelie.ca</code> automatically.
         </p>
 
@@ -474,7 +474,7 @@ export default function SecuritySettings() {
         </h3>
 
         <p className="text-[11px] md:text-xs text-zinc-400 font-mono leading-relaxed">
-          Restore all videos, albums, merch products, and links back to the original WH!TE L!E defaults. 
+          Restore all videos, albums, merch products, shows, and links back to the original WH!TE L!E defaults. 
           Use this if you want to undo any experimental changes or start clean.
         </p>
 

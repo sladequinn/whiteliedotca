@@ -117,6 +117,7 @@ router.get('/data', (_req, res) => {
   const merch = db.prepare('SELECT * FROM merch ORDER BY sort_order ASC').all() as Array<any>;
   const links = db.prepare('SELECT * FROM links ORDER BY sort_order ASC').all() as Array<any>;
   const info = db.prepare("SELECT * FROM info WHERE id = 'main'").get() as any;
+  const shows = db.prepare('SELECT * FROM shows ORDER BY sort_order ASC').all() as Array<any>;
 
   // Format channels
   const channels = {
@@ -156,6 +157,15 @@ router.get('/data', (_req, res) => {
       management_email: '',
       general_email: '',
     },
+    shows: shows.map(s => ({
+      id: s.id,
+      date: s.date || '',
+      title: s.title || '',
+      city: s.city || '',
+      blurb: s.blurb || '',
+      ticketUrl: s.ticket_url || '',
+      sort_order: s.sort_order ?? 0,
+    })),
   });
 });
 
@@ -445,6 +455,35 @@ router.put('/info', requireAuth, (req, res) => {
   return res.json({ success: true });
 });
 
+// PUT /api/shows (save full upcoming shows list)
+router.put('/shows', requireAuth, (req, res) => {
+  const { shows } = req.body;
+  if (!Array.isArray(shows)) {
+    return res.status(400).json({ error: 'Shows array required' });
+  }
+
+  const replaceTx = db.transaction(() => {
+    db.prepare('DELETE FROM shows').run();
+    const insertShow = db.prepare(
+      'INSERT INTO shows (id, date, title, city, blurb, ticket_url, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    );
+    shows.forEach((s, idx) => {
+      insertShow.run(
+        s.id || `show-${idx}`,
+        s.date || '',
+        s.title || '',
+        s.city || '',
+        s.blurb || '',
+        s.ticketUrl || '',
+        idx
+      );
+    });
+  });
+  replaceTx();
+
+  return res.json({ success: true });
+});
+
 // POST /api/export-to-data-file (syncs current SQLite state into src/data.ts for static hosts / git commits)
 router.post('/export-to-data-file', requireAuth, (_req, res) => {
   try {
@@ -458,6 +497,7 @@ router.post('/export-to-data-file', requireAuth, (_req, res) => {
     const merch = db.prepare('SELECT * FROM merch ORDER BY sort_order ASC').all() as Array<any>;
     const links = db.prepare('SELECT * FROM links ORDER BY sort_order ASC').all() as Array<any>;
     const info = db.prepare("SELECT * FROM info WHERE id = 'main'").get() as any;
+    const shows = db.prepare('SELECT * FROM shows ORDER BY sort_order ASC').all() as Array<any>;
 
     const channels = {
       featured: videos.filter(v => v.category === 'featured').map(v => v.url),
@@ -501,12 +541,23 @@ router.post('/export-to-data-file', requireAuth, (_req, res) => {
       general_email: info?.general_email || '',
     };
 
+    const formattedShows = shows.map((s: any, idx: number) => ({
+      id: s.id,
+      date: s.date || '',
+      title: s.title || '',
+      city: s.city || '',
+      blurb: s.blurb || '',
+      ticketUrl: s.ticket_url || '',
+      sort_order: s.sort_order ?? idx,
+    }));
+
     const fileContent = generateDataTsCode({
       channels,
       albums: formattedAlbums,
       merch: formattedMerch,
       links: formattedLinks,
       info: formattedInfo,
+      shows: formattedShows,
     });
 
     const dataPath = path.resolve(process.cwd(), 'src/data.ts');
@@ -525,6 +576,7 @@ router.post('/reset', requireAuth, (_req, res) => {
     DELETE FROM merch;
     DELETE FROM links;
     DELETE FROM info;
+    DELETE FROM shows;
   `);
   // Re-seed
   initDatabase();
