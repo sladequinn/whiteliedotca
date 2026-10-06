@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { rawChannels as defaultRawChannels, albums as defaultAlbums, merch as defaultMerch, siteLinks as defaultLinks, siteInfo as defaultInfo, upcomingShows as defaultShows } from '../data';
-import { generateDataTsCode, downloadDataFile } from '../utils/exportData';
+import { generateDataTsCode } from '../utils/exportData';
 import { publishDataTsToGitHub } from '../utils/githubPublish';
 
 export interface VideoItem {
@@ -105,9 +105,6 @@ interface AppDataContextType {
   updateInfo: (info: InfoItem) => Promise<void>;
   updateShows: (shows: ShowItem[]) => Promise<void>;
   resetToDefaults: () => Promise<void>;
-  exportToDataFile: () => Promise<void>;
-  downloadDataFileLocal: () => void;
-  getDataFileCode: () => string;
   publishToGitHub: () => Promise<{ commitUrl?: string; htmlUrl?: string }>;
 }
 
@@ -598,26 +595,6 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     setPlaylist(buildPlaylist(defaultRawChannels));
   };
 
-  const exportToDataFile = async () => {
-    const res = await fetch('/api/export-to-data-file', {
-      method: 'POST',
-      headers: authHeaders(),
-    });
-    const contentType = res.headers.get('content-type') || '';
-    if (!res.ok || !contentType.includes('application/json')) {
-      throw new Error('Server export endpoint is unavailable on static hosting. Use "Download data.ts" instead!');
-    }
-  };
-
-  const getDataFileCode = useCallback(() => {
-    return generateDataTsCode({ channels, albums, merch, links, info, shows });
-  }, [channels, albums, merch, links, info, shows]);
-
-  const downloadDataFileLocal = useCallback(() => {
-    const code = generateDataTsCode({ channels, albums, merch, links, info, shows });
-    downloadDataFile('data.ts', code);
-  }, [channels, albums, merch, links, info, shows]);
-
   const publishToGitHub = useCallback(async () => {
     const code = generateDataTsCode({ channels, albums, merch, links, info, shows });
     return publishDataTsToGitHub(code);
@@ -654,9 +631,6 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         updateInfo,
         updateShows,
         resetToDefaults,
-        exportToDataFile,
-        downloadDataFileLocal,
-        getDataFileCode,
         publishToGitHub,
       }}
     >

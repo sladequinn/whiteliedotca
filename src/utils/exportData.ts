@@ -117,15 +117,3 @@ export function generateDataTsCode(payload: DataFilePayload): string {
     `    ...shuffle(rawChannels.munchtime).map((url, i) => ({ id: \`munch-\${i}\`, url, category: 'munchtime' }))\n` +
     `];\n`;
 }
-
-export function downloadDataFile(filename: string, content: string) {
-  const blob = new Blob([content], { type: 'text/typescript;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
