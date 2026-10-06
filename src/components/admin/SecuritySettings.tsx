@@ -199,44 +199,9 @@ export default function SecuritySettings() {
         </h3>
 
         <p className="text-[11px] md:text-xs text-zinc-400 font-mono leading-relaxed">
-          Paste a GitHub token once. After that, <strong className="text-white">PUBLISH TO SITE</strong> commits
-          videos, albums, merch, shows, links, and bio into <code className="text-white bg-zinc-900 px-1 py-0.5">src/data.ts</code>.
-          Vercel watches GitHub and rebuilds <code className="text-white bg-zinc-900 px-1 py-0.5">whitelie.ca</code> automatically.
+          <strong className="text-white">PUBLISH TO SITE</strong> pushes videos, albums, merch, shows, links, and bio
+          live to <code className="text-white bg-zinc-900 px-1 py-0.5">whitelie.ca</code>.
         </p>
-
-        <div className="p-3 border border-white/15 bg-black/60 space-y-2 text-[11px] md:text-xs text-zinc-300 font-mono leading-relaxed">
-          <p className="text-white font-bold uppercase tracking-widest text-[10px]">Use a Classic token (easier)</p>
-          <p>
-            Skip Fine-grained. There is no permission named <strong className="text-white">Write</strong>.
-            GitHub’s Fine-grained page also shows <em>“This token does not have access to any repositories”</em>
-            until <code className="text-white">whiteliedotca</code> appears as a chip under the dropdown — typing
-            the name, or picking “All repositories,” often does not stick.
-          </p>
-          <ol className="list-decimal pl-5 space-y-1 text-zinc-400">
-            <li>
-              Open{' '}
-              <a
-                href="https://github.com/settings/tokens/new?description=WHTE%20LIE%20Backstage%20Publish&scopes=public_repo"
-                target="_blank"
-                rel="noreferrer"
-                className="text-cyan-400 underline hover:text-white"
-              >
-                Generate a Classic token
-              </a>
-              {' '}(Developer settings → Personal access tokens → <strong className="text-white">Tokens (classic)</strong>)
-            </li>
-            <li>
-              Under the <strong className="text-white">repo</strong> group, check only{' '}
-              <strong className="text-white">public_repo</strong> — Access public repositories
-            </li>
-            <li>Generate, copy the <code className="text-white">ghp_</code> token (not <code className="text-white">github_pat_</code>), paste it below</li>
-          </ol>
-          <p className="text-zinc-500">
-            If you already made a Fine-grained token: Resource owner = your user, then click
-            {' '}<code className="text-zinc-300">whiteliedotca</code> so a chip appears, then set
-            {' '}<strong className="text-zinc-300">Contents → Read and write</strong>. Classic is simpler.
-          </p>
-        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="sm:col-span-2">
