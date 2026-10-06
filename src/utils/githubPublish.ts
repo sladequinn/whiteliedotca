@@ -68,12 +68,9 @@ function contentsUrl(config: GitHubPublishConfig): string {
   return `https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}/contents/${config.path}`;
 }
 
-const TOKEN_HELP =
-  'Easiest: GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic). Enable the public_repo checkbox, generate, paste the ghp_ token here.';
-
 export async function testGitHubConnection(config = loadGitHubConfig()): Promise<{ ok: boolean; login?: string; error?: string }> {
   if (!config.token) {
-    return { ok: false, error: 'Paste a GitHub Personal Access Token first.' };
+    return { ok: false, error: 'Paste a GitHub token first.' };
   }
 
   const fileRes = await fetch(`${contentsUrl(config)}?ref=${encodeURIComponent(config.branch)}`, {
@@ -81,12 +78,12 @@ export async function testGitHubConnection(config = loadGitHubConfig()): Promise
   });
 
   if (fileRes.status === 401) {
-    return { ok: false, error: `GitHub did not accept this token. ${TOKEN_HELP}` };
+    return { ok: false, error: 'GitHub did not accept this token.' };
   }
   if (fileRes.status === 403) {
     return {
       ok: false,
-      error: `Token is valid but cannot read ${config.owner}/${config.repo}. ${TOKEN_HELP}`,
+      error: `Token cannot read ${config.owner}/${config.repo}.`,
     };
   }
   if (fileRes.status === 404) {
@@ -118,7 +115,7 @@ export async function publishDataTsToGitHub(
 ): Promise<{ commitUrl?: string; htmlUrl?: string }> {
   const config = loadGitHubConfig();
   if (!config.token) {
-    throw new Error('Add a GitHub token in Security, then click Publish. One-time setup — after that it commits for you.');
+    throw new Error('Add a GitHub token in Security, then click Publish.');
   }
 
   const apiUrl = contentsUrl(config);
@@ -127,7 +124,7 @@ export async function publishDataTsToGitHub(
   });
 
   if (getRes.status === 401 || getRes.status === 403) {
-    throw new Error(`GitHub blocked this token (${getRes.status}). Use a Classic token with the public_repo checkbox enabled.`);
+    throw new Error(`GitHub blocked this token (${getRes.status}).`);
   }
 
   let sha: string | undefined;
@@ -156,7 +153,7 @@ export async function publishDataTsToGitHub(
   if (!putRes.ok) {
     const err = await putRes.json().catch(() => ({}));
     if (putRes.status === 403 || putRes.status === 401) {
-      throw new Error(err.message || 'Token cannot write to this repo. Use a Classic token with public_repo enabled.');
+      throw new Error(err.message || 'Token cannot write to this repo.');
     }
     throw new Error(err.message || `GitHub commit failed (${putRes.status})`);
   }
