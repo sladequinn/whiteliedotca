@@ -24,7 +24,7 @@ export default function ShowsManager() {
       title: '',
       city: '',
       blurb: '',
-      ticketUrl: 'https://',
+      ticketUrl: '',
       sort_order: editable.length,
     };
     setEditable([...editable, next]);
