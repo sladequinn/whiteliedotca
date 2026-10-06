@@ -68,34 +68,48 @@ function contentsUrl(config: GitHubPublishConfig): string {
   return `https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}/contents/${config.path}`;
 }
 
+const TOKEN_HELP =
+  'Easiest: GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic). Enable the public_repo checkbox, generate, paste the ghp_ token here.';
+
 export async function testGitHubConnection(config = loadGitHubConfig()): Promise<{ ok: boolean; login?: string; error?: string }> {
   if (!config.token) {
     return { ok: false, error: 'Paste a GitHub Personal Access Token first.' };
   }
 
-  const userRes = await fetch('https://api.github.com/user', {
-    headers: githubHeaders(config.token),
-  });
-  if (userRes.status === 401 || userRes.status === 403) {
-    return { ok: false, error: 'GitHub rejected this token. Create a new Fine-grained token with Contents: Read and write on this repo.' };
-  }
-  if (!userRes.ok) {
-    return { ok: false, error: `GitHub auth check failed (${userRes.status})` };
-  }
-  const user = await userRes.json();
-
   const fileRes = await fetch(`${contentsUrl(config)}?ref=${encodeURIComponent(config.branch)}`, {
     headers: githubHeaders(config.token),
   });
+
+  if (fileRes.status === 401) {
+    return { ok: false, error: `GitHub did not accept this token. ${TOKEN_HELP}` };
+  }
+  if (fileRes.status === 403) {
+    return {
+      ok: false,
+      error: `Token is valid but cannot read ${config.owner}/${config.repo}. ${TOKEN_HELP}`,
+    };
+  }
   if (fileRes.status === 404) {
-    return { ok: false, error: `Could not find ${config.path} on ${config.owner}/${config.repo}@${config.branch}` };
+    return {
+      ok: false,
+      error: `Could not find ${config.path} on ${config.owner}/${config.repo}@${config.branch}. Check owner/repo/branch, or the token may not include this repo.`,
+    };
   }
   if (!fileRes.ok) {
     const err = await fileRes.json().catch(() => ({}));
     return { ok: false, error: err.message || `Could not read ${config.path} (${fileRes.status})` };
   }
 
-  return { ok: true, login: user.login };
+  let login: string | undefined;
+  try {
+    const userRes = await fetch('https://api.github.com/user', { headers: githubHeaders(config.token) });
+    if (userRes.ok) {
+      const user = await userRes.json();
+      login = user.login;
+    }
+  } catch {}
+
+  return { ok: true, login };
 }
 
 export async function publishDataTsToGitHub(
@@ -113,7 +127,7 @@ export async function publishDataTsToGitHub(
   });
 
   if (getRes.status === 401 || getRes.status === 403) {
-    throw new Error('GitHub token was rejected. Create a Fine-grained Personal Access Token with Contents: Read and write.');
+    throw new Error(`GitHub blocked this token (${getRes.status}). Use a Classic token with the public_repo checkbox enabled.`);
   }
 
   let sha: string | undefined;
@@ -141,6 +155,9 @@ export async function publishDataTsToGitHub(
 
   if (!putRes.ok) {
     const err = await putRes.json().catch(() => ({}));
+    if (putRes.status === 403 || putRes.status === 401) {
+      throw new Error(err.message || 'Token cannot write to this repo. Use a Classic token with public_repo enabled.');
+    }
     throw new Error(err.message || `GitHub commit failed (${putRes.status})`);
   }
 

@@ -68,9 +68,12 @@ Once this code is on GitHub, the easiest way to get it live on the internet is t
 Because Vercel is a static host, database edits on the live site live in the browser until you publish:
 
 1. Open `#admin` → **SECURITY**
-2. Create a GitHub Fine-grained token with **Contents: Read and write** on `sladequinn/whiteliedotca`
-3. Paste the token (stored only in this browser)
-4. Click **PUBLISH TO SITE**
-5. Wait ~1 minute for Vercel to rebuild `whitelie.ca`
+2. Create a **Classic** Personal Access Token (not Fine-grained):
+   [Generate token](https://github.com/settings/tokens/new?description=WHTE%20LIE%20Backstage%20Publish&scopes=public_repo)
+   Check only **`public_repo`** (there is no permission named Write). Paste the `ghp_...` token.
+3. Click **TEST CONNECTION**, then **PUBLISH TO SITE**
+4. Wait ~1 minute for Vercel to rebuild `whitelie.ca`
+
+Fine-grained tokens are harder: GitHub has no “Write” permission (use **Contents → Read and write**), and it shows *“This token does not have access to any repositories”* until `whiteliedotca` appears as a selected chip under the dropdown — typing the name is not enough.
 
 There is also a **PUBLISH** button in the Backstage header after you are logged in.
