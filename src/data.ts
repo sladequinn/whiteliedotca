@@ -1,8 +1,8 @@
 export const rawChannels = {
     "featured": [
+        "https://res.cloudinary.com/yjtphln7/video/upload/v1791349996/AA1.mp4",
         "https://res.cloudinary.com/dj3uocb74/video/upload/v1772865413/e4330852-b73c-4137-ad3b-8f5e9d4a828f_oktni5.mp4",
-        "https://res.cloudinary.com/dj3uocb74/video/upload/v1772865207/9ac2a10c-e3bd-4fa4-b3c1-7ddaaf0afd07_jtslel.mp4",
-        "https://res.cloudinary.com/yjtphln7/video/upload/v1791349996/AA1.mp4"
+        "https://res.cloudinary.com/dj3uocb74/video/upload/v1772865207/9ac2a10c-e3bd-4fa4-b3c1-7ddaaf0afd07_jtslel.mp4"
     ],
     "duets": [
         "https://res.cloudinary.com/dj3uocb74/video/upload/v1772856943/duet19_r9wyag.mp4",
